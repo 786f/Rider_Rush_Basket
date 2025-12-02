@@ -4,8 +4,10 @@ import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_navigation/get_navigation.dart';
 import 'package:riderrushbasketapp/app/module/auth/order/screen/accountpage/supportpage.dart';
 
+import '../../../../widget/bottomnav.dart';
 import '../../login/controller/login_controller.dart';
 import '../../login/screen/login_page.dart';
+import '../../onboarding/screen/onboarding_screen.dart';
 import 'accountpage/allotedpage.dart';
 import 'accountpage/askforleave.dart';
 import 'accountpage/editpage.dart';
@@ -13,6 +15,8 @@ import 'accountpage/faqpage.dart';
 import 'accountpage/privacypage.dart';
 import 'accountpage/referearn.dart';
 import 'accountpage/termcondition.dart';
+import 'accountpage/walletpage.dart';
+import 'order_page.dart';
 
 class AccountPage extends StatelessWidget {
   const AccountPage({super.key});
@@ -22,12 +26,13 @@ class AccountPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFFF7EF), // Soft light background
+      bottomNavigationBar: const BottomNav(currentIndex: 3),
 
+      backgroundColor: const Color(0xFFFFF7EF), // Soft light background
       appBar: AppBar(
+        automaticallyImplyLeading: false,
+        elevation: 0,
         backgroundColor: Colors.white,
-        elevation: 4,
-        shadowColor: Colors.black12,
         centerTitle: true,
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(bottom: Radius.circular(22)),
@@ -47,7 +52,12 @@ class AccountPage extends StatelessWidget {
             ),
           ],
         ),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios, color: Color(0xFFF28C28), size: 20),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
       ),
+
 
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -164,6 +174,10 @@ class AccountPage extends StatelessWidget {
             _optionTile(Icons.person_outline, "Edit Profile", () {
               Get.to(() => EditProfilePage());
             }),
+            _optionTile(Icons.account_balance_wallet_outlined, "Wallet", () {
+              Get.to(() => const WalletPage());
+            }),
+
             _optionTile(Icons.map_outlined, "Allotted Area", () {
               Get.to(() => AllottedAreaPage());
             }),
@@ -217,30 +231,7 @@ class AccountPage extends StatelessWidget {
       ),
 
       /// ---------------- BOTTOM NAVIGATION ----------------
-      bottomNavigationBar: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 14),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black12.withOpacity(0.10),
-              blurRadius: 12,
-              spreadRadius: 2,
-              offset: const Offset(0, -2),
-            )
-          ],
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            _bottomNavItem(Icons.shopping_bag, "Orders", false, () {
-              Navigator.pop(context);
-            }),
-            _bottomNavItem(Icons.person, "Account", true, () {}),
-          ],
-        ),
-      ),
+
     );
   }
 

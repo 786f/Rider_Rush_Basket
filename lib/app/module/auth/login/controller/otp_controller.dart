@@ -37,7 +37,7 @@ class OtpController extends GetxController {
       Get.snackbar("Success", "OTP Verified!");
 
       Future.delayed(const Duration(milliseconds: 300), () {
-        Get.offAllNamed(AppRoutes.onboarding);  // <<< NAVIGATE TO HOME
+        Get.offAllNamed(AppRoutes.personal);  // <<< NAVIGATE TO HOME
       });
     } else {
       Get.snackbar("Error", "Enter valid 4-digit OTP");

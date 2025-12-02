@@ -8,6 +8,7 @@ class AppRoutes {
   static const String workDetails = '/work-details';
   static const String documents = '/documents';
   static const String success = '/success';
+  static const String personal = '/personal';
 
 
 

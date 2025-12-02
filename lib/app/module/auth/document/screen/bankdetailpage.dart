@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'document_upload_status.dart';
-
 
 class BankDetailPage extends StatefulWidget {
   final bool isEditing;
@@ -15,10 +15,10 @@ class BankDetailPage extends StatefulWidget {
 }
 
 class _BankDetailPageState extends State<BankDetailPage> {
-  TextEditingController bankNameController = TextEditingController();
-  TextEditingController accountController = TextEditingController();
-  TextEditingController ifscController = TextEditingController();
-  TextEditingController branchController = TextEditingController();
+  final TextEditingController bankNameController = TextEditingController();
+  final TextEditingController accountController = TextEditingController();
+  final TextEditingController ifscController = TextEditingController();
+  final TextEditingController branchController = TextEditingController();
 
   @override
   void initState() {
@@ -40,10 +40,12 @@ class _BankDetailPageState extends State<BankDetailPage> {
   Future<void> saveBankDetails() async {
     final prefs = await SharedPreferences.getInstance();
 
-    prefs.setString("bankName", bankNameController.text);
-    prefs.setString("accountNumber", accountController.text);
-    prefs.setString("ifscCode", ifscController.text);
-    prefs.setString("branchName", branchController.text);
+    String accountNumber = accountController.text.replaceAll(' ', '');
+
+    await prefs.setString("bankName", bankNameController.text);
+    await prefs.setString("accountNumber", accountNumber);
+    await prefs.setString("ifscCode", ifscController.text.toUpperCase());
+    await prefs.setString("branchName", branchController.text);
 
     UploadStatus.bankUploaded = true;
     await UploadStatus.saveStatus();
@@ -55,7 +57,12 @@ class _BankDetailPageState extends State<BankDetailPage> {
       colorText: Colors.black,
     );
 
-    Navigator.pop(context); // refresh list
+    Navigator.pop(context, true); // 🔥 return true to refresh parent
+  }
+
+
+  void skipBankDetails() {
+    Navigator.pop(context); // Simply go back to previous page
   }
 
   @override
@@ -75,23 +82,66 @@ class _BankDetailPageState extends State<BankDetailPage> {
           icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
           onPressed: () => Navigator.pop(context),
         ),
+        actions: [
+          TextButton(
+            onPressed: skipBankDetails,
+            style: TextButton.styleFrom(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              minimumSize: Size.zero,
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            ),
+            child: const Text(
+              "Skip",
+              style: TextStyle(
+                color: Colors.grey,
+                fontWeight: FontWeight.normal,
+                fontSize: 14,
+              ),
+            ),
+          ),
+        ],
       ),
-
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            buildInput("Bank Name", bankNameController),
+            buildLabeledInput(
+              "Bank Name",
+              bankNameController,
+              hintText: "Enter your bank name",
+            ),
             const SizedBox(height: 16),
-            buildInput("Account Number", accountController,
-                keyboardType: TextInputType.number),
+            buildLabeledInput(
+              "Account Number",
+              accountController,
+              keyboardType: TextInputType.number,
+              hintText: "Enter your account number",
+              inputFormatters: [
+                FilteringTextInputFormatter.digitsOnly,
+                LengthLimitingTextInputFormatter(16),
+                AccountNumberFormatter(),
+              ],
+            ),
             const SizedBox(height: 16),
-            buildInput("IFSC Code", ifscController),
+            buildLabeledInput(
+              "IFSC Code",
+              ifscController,
+              textCapitalization: TextCapitalization.characters,
+              hintText: "Enter IFSC code (e.g., ABCD0123456)",
+              inputFormatters: [
+                FilteringTextInputFormatter.allow(RegExp(r'[A-Za-z0-9]')),
+                LengthLimitingTextInputFormatter(11),
+                UpperCaseTextFormatter(),
+              ],
+            ),
             const SizedBox(height: 16),
-            buildInput("Branch Name", branchController),
-
+            buildLabeledInput(
+              "Branch Name",
+              branchController,
+              hintText: "Enter branch name",
+            ),
             const SizedBox(height: 30),
-
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
@@ -113,30 +163,80 @@ class _BankDetailPageState extends State<BankDetailPage> {
                       fontWeight: FontWeight.bold),
                 ),
               ),
-            )
+            ),
           ],
         ),
       ),
     );
   }
 
-  Widget buildInput(String label, TextEditingController controller,
-      {TextInputType keyboardType = TextInputType.text}) {
-    return TextField(
-      controller: controller,
-      keyboardType: keyboardType,
-      decoration: InputDecoration(
-        labelText: label,
-        filled: true,
-        fillColor: Colors.white,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
+  Widget buildLabeledInput(
+      String label,
+      TextEditingController controller, {
+        TextInputType keyboardType = TextInputType.text,
+        List<TextInputFormatter>? inputFormatters,
+        TextCapitalization textCapitalization = TextCapitalization.none,
+        String? hintText,
+      }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(
+              fontWeight: FontWeight.bold, fontSize: 14, color: Colors.black87),
         ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: Color(0xFFF28C28)),
+        const SizedBox(height: 6),
+        TextField(
+          controller: controller,
+          keyboardType: keyboardType,
+          inputFormatters: inputFormatters,
+          textCapitalization: textCapitalization,
+          decoration: InputDecoration(
+            hintText: hintText,
+            hintStyle: const TextStyle(color: Colors.grey),
+            filled: true,
+            fillColor: Colors.white,
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(14),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(14),
+              borderSide: const BorderSide(color: Color(0xFFF28C28)),
+            ),
+          ),
         ),
-      ),
+      ],
+    );
+  }
+}
+
+// Forces IFSC code to uppercase
+class UpperCaseTextFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+      TextEditingValue oldValue, TextEditingValue newValue) {
+    return TextEditingValue(
+      text: newValue.text.toUpperCase(),
+      selection: newValue.selection,
+    );
+  }
+}
+
+// Formats account number with spaces every 4 digits
+class AccountNumberFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+      TextEditingValue oldValue, TextEditingValue newValue) {
+    String digitsOnly = newValue.text.replaceAll(' ', '');
+    String formatted = '';
+    for (int i = 0; i < digitsOnly.length; i++) {
+      if (i != 0 && i % 4 == 0) formatted += ' ';
+      formatted += digitsOnly[i];
+    }
+    return TextEditingValue(
+      text: formatted,
+      selection: TextSelection.collapsed(offset: formatted.length),
     );
   }
 }

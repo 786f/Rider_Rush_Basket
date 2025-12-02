@@ -271,156 +271,50 @@ class DocumentCompletedList extends StatelessWidget {
 // ============================================================================
 // COMPLETED TILE
 // ============================================================================
-class CompletedTile extends StatelessWidget {
+class CompletedTile extends StatefulWidget {
   final String title;
 
   const CompletedTile({super.key, required this.title});
 
+  @override
+  State<CompletedTile> createState() => _CompletedTileState();
+}
+
+class _CompletedTileState extends State<CompletedTile> {
   Future<void> handleDelete(BuildContext context) async {
     bool? confirm = await showDialog(
       context: context,
-      builder: (_) => Dialog(
-        backgroundColor: Colors.transparent,
-        insetPadding: const EdgeInsets.symmetric(horizontal: 20),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(22),
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
-            child: Container(
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.85),
-                borderRadius: BorderRadius.circular(22),
-                border: Border.all(
-                  color: Colors.white.withOpacity(0.5),
-                  width: 1.2,
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.08),
-                    blurRadius: 25,
-                    offset: const Offset(0, 15),
-                  )
-                ],
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-
-                  // 🔥 Top Icon
-                  Container(
-                    padding: const EdgeInsets.all(18),
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Colors.red.withOpacity(0.15),
-                    ),
-                    child: const Icon(Icons.delete_forever,
-                        color: Colors.red, size: 40),
-                  ),
-
-                  const SizedBox(height: 18),
-
-                  // 🔥 Title
-                  const Text(
-                    "Remove Document?",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w700,
-                      color: Colors.black87,
-                    ),
-                  ),
-
-                  const SizedBox(height: 10),
-
-                  // 🔥 Subtitle
-                  const Text(
-                    "Are you sure you want to delete this document?\nYou can re-upload anytime.",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 14,
-                      height: 1.4,
-                      color: Colors.black54,
-                    ),
-                  ),
-
-                  const SizedBox(height: 25),
-
-                  // 🔥 Buttons Row
-                  Row(
-                    children: [
-                      // ❌ Cancel Button
-                      Expanded(
-                        child: OutlinedButton(
-                          onPressed: () => Navigator.pop(context, false),
-                          style: OutlinedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(vertical: 14),
-                            side: const BorderSide(color: Color(0xFFF28C28)),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
-                          child: const Text(
-                            "Cancel",
-                            style: TextStyle(
-                              color: Color(0xFFF28C28),
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
-                      ),
-
-                      const SizedBox(width: 12),
-
-                      // 🧨 Delete Button
-                      Expanded(
-                        child: ElevatedButton(
-                          onPressed: () => Navigator.pop(context, true),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFFF28C28),
-                            padding: const EdgeInsets.symmetric(vertical: 14),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
-                          child: const Text(
-                            "Delete",
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  )
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
+      builder: (_) => _deleteDialog(),
     );
 
     if (confirm != true) return;
 
     final prefs = await SharedPreferences.getInstance();
 
-    if (title == "Profile Picture") {
+    // RESET DATA ACCORDING TO DOCUMENT TYPE
+    if (widget.title == "Profile Picture") {
       UploadStatus.profileUploaded = false;
       prefs.remove("profileImage");
-    } else if (title == "Aadhaar Card") {
+
+    } else if (widget.title == "Aadhaar Card") {
       UploadStatus.aadhaarUploaded = false;
       prefs.remove("aadhaarFront");
       prefs.remove("aadhaarBack");
-    } else if (title == "PAN Card") {
+      prefs.remove("aadhaarNumber");
+
+    } else if (widget.title == "PAN Card") {
       UploadStatus.panUploaded = false;
-      prefs.remove("panImage");
-    } else if (title == "Driving License") {
+      prefs.remove("panNumber");
+      prefs.remove("panFront");
+      prefs.remove("panBack");
+
+    } else if (widget.title == "Driving License") {
       UploadStatus.licenseUploaded = false;
+      prefs.remove("licenseNumber");
       prefs.remove("licenseFront");
       prefs.remove("licenseBack");
-    } else if (title == "Bank Details") {
+
+    } else if (widget.title == "Bank Details") {
       UploadStatus.bankUploaded = false;
       prefs.remove("bankName");
       prefs.remove("accountNumber");
@@ -428,46 +322,117 @@ class CompletedTile extends StatelessWidget {
       prefs.remove("branchName");
     }
 
+    // SAVE UPDATED STATUS
     await UploadStatus.saveStatus();
-    Get.to(() => const DocumentsPage());
+
+    // 👈 IMPORTANT: Refresh current tile UI
+    setState(() {});
+
+    // 👈 IMPORTANT: Refresh parent list (DocumentsPage)
+    (context.findAncestorStateOfType<_DocumentsPageState>())?.setState(() {});
+
+    // Close dialog if still open
+    if (Navigator.canPop(context)) {
+      Navigator.pop(context);
+    }
   }
+
+  Widget _deleteDialog() {
+    return Dialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.warning, size: 50, color: Colors.red),
+            SizedBox(height: 12),
+
+            Text(
+              "Delete Document?",
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+
+            SizedBox(height: 10),
+
+            Text(
+              "Are you sure you want to delete this document? "
+                  "You will need to upload it again.",
+              textAlign: TextAlign.center,
+            ),
+
+            SizedBox(height: 25),
+
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                // CANCEL
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.grey.shade300,
+                    foregroundColor: Colors.black,
+                  ),
+                  onPressed: () {
+                    Navigator.pop(context, false);
+                  },
+                  child: Text("Cancel"),
+                ),
+
+                // DELETE
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.red,
+                    foregroundColor: Colors.white,
+                  ),
+                  onPressed: () {
+                    Navigator.pop(context, true);
+                  },
+                  child: Text("Delete"),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.only(bottom: 12),
+      margin: const EdgeInsets.only(bottom: 12),
       child: ListTile(
         tileColor: Colors.white,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         leading: const Icon(Icons.check_circle, color: Colors.green),
         title: Text(
-          title,
+          widget.title,
           style: const TextStyle(fontWeight: FontWeight.bold),
         ),
-
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             InkWell(
               onTap: () {
-                if (title == "Profile Picture") {
+                if (widget.title == "Profile Picture") {
                   Get.to(() => const ProfileUploadPage(isEditing: true));
-                } else if (title == "Aadhaar Card") {
+                } else if (widget.title == "Aadhaar Card") {
                   Get.to(() => const AadhaarUploadPage(isEditing: true));
-                } else if (title == "PAN Card") {
+                } else if (widget.title == "PAN Card") {
                   Get.to(() => const PanUploadPage(isEditing: true));
-                } else if (title == "Driving License") {
+                } else if (widget.title == "Driving License") {
                   Get.to(() => const DrivingLicenseUploadPage(isEditing: true));
-                } else if (title == "Bank Details") {
+                } else if (widget.title == "Bank Details") {
                   Get.to(() => const BankDetailPage(isEditing: true));
                 }
               },
-              child: Icon(Icons.edit, color: Colors.orange),
+              child: const Icon(Icons.edit, color: Colors.orange),
             ),
-            SizedBox(width: 12),
+            const SizedBox(width: 12),
             InkWell(
               onTap: () => handleDelete(context),
-              child: Icon(Icons.delete, color: Colors.red),
+              child: const Icon(Icons.delete, color: Colors.red),
             ),
           ],
         ),
@@ -475,3 +440,4 @@ class CompletedTile extends StatelessWidget {
     );
   }
 }
+

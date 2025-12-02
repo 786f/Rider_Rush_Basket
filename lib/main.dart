@@ -9,6 +9,7 @@ import 'package:riderrushbasketapp/app/module/auth/splash/binding/splash_binding
 import 'app/module/auth/document/screen/document_page.dart';
 import 'app/module/auth/login/binding/otp_binding.dart';
 import 'app/module/auth/onboarding/screen/onboarding_screen.dart';
+import 'app/module/auth/personal/personalinfo.dart';
 import 'app/module/auth/splash/screen/splash_screen.dart';
 import 'app/module/auth/success/screen/success_page.dart';
 import 'app/module/auth/workdetail/screen/workdetailpage.dart';
@@ -47,6 +48,11 @@ class MyApp extends StatelessWidget {
           name: AppRoutes.onboarding,
           page: () => const OnboardingPage(),
           binding: OnboardingBindings(),
+        ),
+        GetPage(
+          name: AppRoutes.personal,
+          page: () => const PersonalInformationPage(),
+         // binding: OnboardingBindings(),
         ),
         GetPage(
           name: AppRoutes.workDetails,

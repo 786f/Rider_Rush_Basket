@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:get/get_core/src/get_main.dart';
-import 'package:get/get_navigation/get_navigation.dart';
+import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -13,133 +12,143 @@ class AadhaarUploadPage extends StatefulWidget {
 
   const AadhaarUploadPage({super.key, this.isEditing = false});
 
-
   @override
   State<AadhaarUploadPage> createState() => _AadhaarUploadPageState();
 }
 
 class _AadhaarUploadPageState extends State<AadhaarUploadPage> {
   final TextEditingController aadhaarController = TextEditingController();
-  XFile? pickedImage;
-
   final ImagePicker picker = ImagePicker();
 
-  Future<void> pickAadhaarImage() async {
-    final file = await picker.pickImage(source: ImageSource.gallery);
-    if (file != null) {
-      setState(() {
-        pickedImage = file;
-      });
-    }
-  }
-
-  bool isValidAadhaar = false;
+  XFile? frontImage;
+  XFile? backImage;
 
   @override
   void initState() {
     super.initState();
-
     if (widget.isEditing) {
       loadExistingAadhaar();
     }
   }
 
+  /// Load saved data
   void loadExistingAadhaar() async {
     final prefs = await SharedPreferences.getInstance();
 
     aadhaarController.text = prefs.getString("aadhaarNumber") ?? "";
 
-    String? savedImg = prefs.getString("aadhaarImage");
+    String? savedFront = prefs.getString("aadhaarFront");
+    String? savedBack = prefs.getString("aadhaarBack");
 
-    if (savedImg != null) {
-      setState(() {
-        pickedImage = XFile(savedImg);
-      });
-    }
+    if (savedFront != null) frontImage = XFile(savedFront);
+    if (savedBack != null) backImage = XFile(savedBack);
+    setState(() {});
   }
 
-
-  @override
-  void dispose() {
-    aadhaarController.dispose();
-    super.dispose();
-  }
-
-
-  void showOtpDialog() {
-    TextEditingController otpController = TextEditingController();
-
-    showDialog(
+  /// Show bottom sheet camera / gallery
+  void showImagePicker(Function(XFile?) onImagePicked) {
+    showModalBottomSheet(
       context: context,
-      barrierDismissible: false,
-      builder: (context) {
-        return AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          title: const Text(
-            "Verify OTP",
-            style: TextStyle(fontWeight: FontWeight.bold),
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Text("Enter the OTP sent to your Aadhaar linked mobile number"),
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (_) {
+        return SafeArea(
+          child: SizedBox(
+            height: 160,
+            child: Column(
+              children: [
 
-              SizedBox(height: 12),
+                const SizedBox(height: 10),
+                const Text("Select Image Source",
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 20),
 
-              TextField(
-                controller: otpController,
-                keyboardType: TextInputType.number,
-                maxLength: 6,
-                decoration: InputDecoration(
-                  hintText: "Enter OTP",
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text("Cancel"),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    // CAMERA
+                    GestureDetector(
+                      onTap: () async {
+                        Navigator.pop(context);
+                        final picked =
+                        await picker.pickImage(source: ImageSource.camera);
+                        onImagePicked(picked);
+                      },
+                      child: Column(
+                        children: const [
+                          Icon(Icons.camera_alt, size: 45, color: Colors.orange),
+                          SizedBox(height: 8),
+                          Text("Camera"),
+                        ],
+                      ),
+                    ),
+
+                    // GALLERY
+                    GestureDetector(
+                      onTap: () async {
+                        Navigator.pop(context);
+                        final picked =
+                        await picker.pickImage(source: ImageSource.gallery);
+                        onImagePicked(picked);
+                      },
+                      child: Column(
+                        children: const [
+                          Icon(Icons.photo_library,
+                              size: 45, color: Colors.orange),
+                          SizedBox(height: 8),
+                          Text("Gallery"),
+                        ],
+                      ),
+                    ),
+                  ],
+                )
+              ],
             ),
-
-            ElevatedButton(
-              onPressed: () {
-                // TODO: Verify OTP API
-                print("Entered OTP: ${otpController.text}");
-
-                Navigator.pop(context);
-              },
-              child: const Text("Verify"),
-            ),
-          ],
+          ),
         );
       },
     );
   }
 
-  Future<void> saveAadhaarDetails(XFile front, XFile back, String aadhaarNumber) async {
+  /// FRONT image selection
+  void pickFrontImage() {
+    showImagePicker((picked) {
+      if (picked != null) {
+        setState(() => frontImage = picked);
+      }
+    });
+  }
+
+  /// BACK image selection
+  void pickBackImage() {
+    showImagePicker((picked) {
+      if (picked != null) {
+        setState(() => backImage = picked);
+      }
+    });
+  }
+
+  /// Save all Aadhaar details locally
+  Future<void> saveAadhaarDetails() async {
     final prefs = await SharedPreferences.getInstance();
 
-    await prefs.setString("aadhaarFront", front.path);
-    await prefs.setString("aadhaarBack", back.path);
-    await prefs.setString("aadhaarNumber", aadhaarNumber);
+    await prefs.setString("aadhaarFront", frontImage!.path);
+    await prefs.setString("aadhaarBack", backImage!.path);
+    await prefs.setString("aadhaarNumber", aadhaarController.text);
 
     UploadStatus.aadhaarUploaded = true;
     await UploadStatus.saveStatus();
 
     Get.snackbar(
       "Success",
-      "Aadhaar Card saved successfully!",
+      "Aadhaar details saved!",
       backgroundColor: Colors.orange.withOpacity(0.2),
       colorText: Colors.black,
     );
 
-    Navigator.pop(context);
+    Get.offNamed(AppRoutes.documents);
   }
 
   @override
@@ -150,42 +159,36 @@ class _AadhaarUploadPageState extends State<AadhaarUploadPage> {
         elevation: 0,
         backgroundColor: const Color(0xFFFFF7EF),
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios, color: Colors.black87),
+          icon: const Icon(Icons.arrow_back_ios, color: Colors.black87),
           onPressed: () => Navigator.pop(context),
         ),
-        title: Text(
+        title: const Text(
           "Fill Aadhaar Card Details",
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: Colors.black,
-          ),
+          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
         ),
       ),
 
       body: SingleChildScrollView(
-        padding: EdgeInsets.all(20),
+        padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-
-            /// Aadhaar Logo
             Center(
               child: Image.asset(
                 "assets/png/adhar.png",
                 height: 80,
               ),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
 
-            /// Heading
-            Text(
+            const Text(
               "Fill Aadhaar Card Details",
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
 
-            SizedBox(height: 6),
+            const SizedBox(height: 6),
             Row(
-              children: [
+              children: const [
                 Icon(Icons.verified, color: Colors.green, size: 20),
                 SizedBox(width: 4),
                 Text(
@@ -194,9 +197,9 @@ class _AadhaarUploadPageState extends State<AadhaarUploadPage> {
                 )
               ],
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
 
-            /// Aadhaar Input Box
+            /// Aadhaar Number Input
             TextField(
               controller: aadhaarController,
               keyboardType: TextInputType.number,
@@ -208,167 +211,99 @@ class _AadhaarUploadPageState extends State<AadhaarUploadPage> {
                 ),
               ),
             ),
-            SizedBox(height: 10),
 
-            /// Get OTP Button
-            // SizedBox(
-            //   width: double.infinity,
-            //   child: ElevatedButton(
-            //     onPressed: isValidAadhaar ? () {
-            //       // SAVE AADHAAR NUMBER
-            //       AadhaarData.aadhaarNumber = aadhaarController.text;
-            //       print("Saved Aadhaar Number: ${AadhaarData.aadhaarNumber}");
-            //
-            //       // CALL YOUR OTP API HERE
-            //       // await sendOtpApi();
-            //
-            //       // OPEN OTP POPUP
-            //       showOtpDialog();
-            //
-            //     } : null,
-            //
-            //     style: ElevatedButton.styleFrom(
-            //       backgroundColor:
-            //       isValidAadhaar ? const Color(0xFFF28C28) : Colors.grey.shade300,
-            //       foregroundColor:
-            //       isValidAadhaar ? Colors.white : Colors.black54,
-            //       padding: const EdgeInsets.symmetric(vertical: 14),
-            //     ),
-            //     child: const Text(
-            //       "Get OTP",
-            //       style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            //     ),
-            //   ),
-            // ),
+            const SizedBox(height: 30),
 
-
-            SizedBox(height: 30),
-
-            /// Divider
             Row(
-              children: [
+              children: const [
                 Expanded(child: Divider()),
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                  padding: EdgeInsets.symmetric(horizontal: 8.0),
                   child: Text("OR"),
                 ),
                 Expanded(child: Divider()),
               ],
             ),
-            SizedBox(height: 20),
 
-            /// TAKE PHOTO SECTION
-            Container(
-              padding: EdgeInsets.all(15),
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.black12),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text("Take photo of your Aadhaar Card",
-                            style: TextStyle(fontWeight: FontWeight.bold)),
-                        SizedBox(height: 4),
-                        Text(
-                          "It will take 1-2 days to verify",
-                          style: TextStyle(color: Colors.orange),
-                        ),
-                      ],
-                    ),
+            const SizedBox(height: 25),
+
+            /// FRONT IMAGE
+            const Text("Upload Aadhaar Front Side",
+                style: TextStyle(fontWeight: FontWeight.bold)),
+            const SizedBox(height: 10),
+
+            GestureDetector(
+              onTap: pickFrontImage,
+              child: Container(
+                height: 180,
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.black26),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: frontImage == null
+                    ? const Center(child: Icon(Icons.camera_alt, size: 45))
+                    : ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: Image.file(
+                    File(frontImage!.path),
+                    width: double.infinity,
+                    height: 180,
+                    fit: BoxFit.cover,
                   ),
-
-                  IconButton(
-                    icon: Icon(Icons.camera_alt, size: 30),
-                    onPressed: pickAadhaarImage,
-                  )
-                ],
+                ),
               ),
             ),
 
-            SizedBox(height: 20),
+            const SizedBox(height: 25),
 
-            if (pickedImage != null) ...[
-              ClipRRect(
-                borderRadius: BorderRadius.circular(12),
-                child: Image.file(
-                  File(pickedImage!.path),
-                  height: 200,
-                  width: double.infinity,
-                  fit: BoxFit.cover,
+            /// BACK IMAGE
+            const Text("Upload Aadhaar Back Side",
+                style: TextStyle(fontWeight: FontWeight.bold)),
+            const SizedBox(height: 10),
+
+            GestureDetector(
+              onTap: pickBackImage,
+              child: Container(
+                height: 180,
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.black26),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: backImage == null
+                    ? const Center(child: Icon(Icons.camera_alt, size: 45))
+                    : ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: Image.file(
+                    File(backImage!.path),
+                    width: double.infinity,
+                    height: 180,
+                    fit: BoxFit.cover,
+                  ),
                 ),
               ),
+            ),
 
-              const SizedBox(height: 20),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  /// RETAKE
-                  ElevatedButton(
-                    onPressed: pickAadhaarImage,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.orange.shade100,
-                      foregroundColor: Colors.black,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 30,
-                        vertical: 12,
-                      ),
+            const SizedBox(height: 30),
+
+            if (frontImage != null && backImage != null)
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: saveAadhaarDetails,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFFF28C28),
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
                     ),
-                    child: const Text("Retake"),
                   ),
-
-                  /// CONFIRM
-                  ElevatedButton(
-                    onPressed: () async {
-                      final prefs = await SharedPreferences.getInstance();
-
-                      UploadStatus.aadhaarUploaded = true;
-
-                      await prefs.setString('aadhaarNumber', aadhaarController.text);
-                      await prefs.setString('aadhaarImage', pickedImage!.path);
-
-                      await UploadStatus.saveStatus();
-
-
-                      Get.offNamed(AppRoutes.documents);
-
-
-                      Get.snackbar(
-                        "Success",
-                        "Aadhaar Card saved successfully!",
-                        backgroundColor: Colors.orange.withOpacity(0.2),
-                        colorText: Colors.black,
-                      );
-
-
-
-
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFFF28C28),
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 30,
-                        vertical: 12,
-                      ),
-                    ),
-                    child: const Text("Confirm & Upload"),
+                  child: const Text(
+                    "Confirm & Upload",
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
-                ],
+                ),
               ),
-
-
-            ],
-
           ],
         ),
       ),
