@@ -16,9 +16,11 @@ class ProfileUploadPage extends StatefulWidget {
   State<ProfileUploadPage> createState() => _ProfileUploadPageState();
 }
 
-class _ProfileUploadPageState extends State<ProfileUploadPage> {
+class _ProfileUploadPageState extends State<ProfileUploadPage>
+    with SingleTickerProviderStateMixin {
   XFile? pickedImage;
   final ImagePicker picker = ImagePicker();
+  late AnimationController _controller;
 
   @override
   void initState() {
@@ -27,14 +29,27 @@ class _ProfileUploadPageState extends State<ProfileUploadPage> {
       loadSavedProfile();
       setState(() {});
     });
+
+    // Animation controller for pulsing circle
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 1),
+    )..repeat(reverse: true);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 
   String? profileImagePath;
-  /// 🔹 Load already saved selfie from local storage
+
+  /// Load already saved selfie from local storage
   void loadSavedProfile() async {
     final prefs = await SharedPreferences.getInstance();
     String? savedImg = prefs.getString("profileImage");
-    profileImagePath = prefs.getString("profileImage");
+    profileImagePath = savedImg;
     if (savedImg != null) {
       setState(() {
         pickedImage = XFile(savedImg);
@@ -42,10 +57,9 @@ class _ProfileUploadPageState extends State<ProfileUploadPage> {
     }
   }
 
-  /// 🔹 Pick image using camera only
+  /// Pick image using camera only
   Future<void> pickImage() async {
     final file = await picker.pickImage(source: ImageSource.camera);
-
     if (file != null) {
       setState(() {
         pickedImage = file;
@@ -53,7 +67,7 @@ class _ProfileUploadPageState extends State<ProfileUploadPage> {
     }
   }
 
-  /// 🔹 Save profile image locally
+  /// Save profile image locally
   Future<void> saveProfile() async {
     if (pickedImage == null) {
       Get.snackbar("Error", "Please take a selfie before saving",
@@ -64,11 +78,9 @@ class _ProfileUploadPageState extends State<ProfileUploadPage> {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString("profileImage", pickedImage!.path);
 
-    /// ⭐ Mark as uploaded
     UploadStatus.profileUploaded = true;
     await UploadStatus.saveStatus();
     Get.offNamed(AppRoutes.documents);
-    // Navigator.pop(context); // Return to previous page → triggers rebuild
 
     Get.snackbar(
       "Success",
@@ -76,77 +88,155 @@ class _ProfileUploadPageState extends State<ProfileUploadPage> {
       backgroundColor: Colors.orange.withOpacity(0.2),
       colorText: Colors.black,
     );
-
-
   }
 
-
-
-  /// 🔹 Preview dialog with Retake + OK
+  /// Modern Preview Dialog
   void showPreviewDialog() {
     showDialog(
       context: context,
-      builder: (_) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        contentPadding: EdgeInsets.all(12),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(12),
-              child: Image.file(
-                File(pickedImage!.path),
-                height: 200,
-                width: double.infinity,
-                fit: BoxFit.cover,
+      barrierDismissible: true,
+      builder: (_) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        elevation: 5,
+        backgroundColor: Colors.white,
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                "Preview Selfie",
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFFF28C28),
+                ),
               ),
-            ),
-            SizedBox(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                ElevatedButton(
-                  onPressed: () async {
-                    Navigator.pop(context);
-                    await pickImage(); // retake selfie
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.orange.shade100,
-                    foregroundColor: Colors.black,
-                  ),
-                  child: const Text("Retake"),
+              const SizedBox(height: 16),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(16),
+                child: Image.file(
+                  File(pickedImage!.path),
+                  height: 220,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
                 ),
-                ElevatedButton(
-                  onPressed: () => Navigator.pop(context),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.orange,
-                    foregroundColor: Colors.white,
+              ),
+              const SizedBox(height: 20),
+              Row(
+                children: [
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () async {
+                        Navigator.pop(context);
+                        await pickImage(); // Retake selfie
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        decoration: BoxDecoration(
+                          color: Colors.orange.shade100,
+                          borderRadius: BorderRadius.circular(12),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.orange.withOpacity(0.3),
+                              blurRadius: 6,
+                              offset: const Offset(0, 3),
+                            ),
+                          ],
+                        ),
+                        alignment: Alignment.center,
+                        child: const Text(
+                          "Retake",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
+                        ),
+                      ),
+                    ),
                   ),
-                  child: const Text("OK"),
-                ),
-              ],
-            )
-          ],
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () => Navigator.pop(context),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        decoration: BoxDecoration(
+                          gradient: const LinearGradient(
+                            colors: [Color(0xFFF28C28), Color(0xFFFFB347)],
+                          ),
+                          borderRadius: BorderRadius.circular(12),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.orange.withOpacity(0.3),
+                              blurRadius: 6,
+                              offset: const Offset(0, 3),
+                            ),
+                          ],
+                        ),
+                        alignment: Alignment.center,
+                        child: const Text(
+                          "OK",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
-  Future<void> saveProfilePicture(XFile image) async {
-    final prefs = await SharedPreferences.getInstance();
 
-    await prefs.setString("profileImage", image.path);
-
-    UploadStatus.profileUploaded = true;
-    await UploadStatus.saveStatus();
-
-    Get.snackbar(
-      "Success",
-      "Profile Picture saved successfully!",
-      backgroundColor: Colors.orange.withOpacity(0.2),
-      colorText: Colors.black,
-    );
-
-    Navigator.pop(context);
+  /// Build profile selfie widget
+  Widget _buildProfileAvatar() {
+    if (pickedImage != null) {
+      return ClipOval(
+        child: Image.file(
+          File(pickedImage!.path),
+          width: 300,
+          height: 300,
+          fit: BoxFit.cover,
+        ),
+      );
+    } else {
+      // Pulsating placeholder
+      return AnimatedBuilder(
+        animation: _controller,
+        builder: (context, child) {
+          double scale = 1 + (_controller.value * 0.1);
+          return Container(
+            width: 150 * scale,
+            height: 150 * scale,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(color: Colors.orange, width: 3),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.orange.withOpacity(0.3),
+                  blurRadius: 10 * _controller.value,
+                  spreadRadius: 2 * _controller.value,
+                ),
+              ],
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: const [
+                Icon(Icons.camera_alt, size: 50, color: Color(0xFFF28C28)),
+                SizedBox(height: 10),
+                Text("Tap to Take Selfie"),
+              ],
+            ),
+          );
+        },
+      );
+    }
   }
 
   @override
@@ -164,13 +254,11 @@ class _ProfileUploadPageState extends State<ProfileUploadPage> {
           ),
         ),
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios, color: Colors.black),
+          icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
           onPressed: () => Navigator.pop(context),
         ),
       ),
-
       backgroundColor: const Color(0xFFFFF7EF),
-
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -180,47 +268,23 @@ class _ProfileUploadPageState extends State<ProfileUploadPage> {
               "Please upload a clear front-facing selfie",
               style: TextStyle(color: Colors.grey),
             ),
-            SizedBox(height: 80),
+            const SizedBox(height: 80),
 
+            // Tap to pick image
             InkWell(
-              onTap: () {
-                if (pickedImage == null) {
-                  pickImage();
-                } else {
-                  showPreviewDialog();
-                }
-              },
-              child: pickedImage == null
-                  ? Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: const [
-                  Icon(Icons.camera_alt,
-                      size: 50, color: Color(0xFFF28C28)),
-                  SizedBox(height: 10),
-                  Text("Tap to Take Selfie"),
-                ],
-              )
-                  : ClipOval(
-                child: Image.file(
-                  File(pickedImage!.path),
-                  width: 300,
-                  height: 300,
-                  fit: BoxFit.cover,
-                ),
-              ),
+              onTap: pickImage,
+              child: _buildProfileAvatar(),
             ),
 
-
-            Spacer(),
+            const Spacer(),
 
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: saveProfile,
-
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFFF28C28),
-                  padding: EdgeInsets.symmetric(vertical: 16),
+                  padding: const EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(14),
                   ),
@@ -228,11 +292,12 @@ class _ProfileUploadPageState extends State<ProfileUploadPage> {
                 child: const Text(
                   "Save",
                   style: TextStyle(
-                      fontWeight: FontWeight.bold, color: Colors.white),
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
                 ),
-
               ),
-            )
+            ),
           ],
         ),
       ),

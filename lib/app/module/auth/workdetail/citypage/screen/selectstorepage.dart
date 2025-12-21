@@ -236,35 +236,62 @@ class _SelectStorePageState extends State<SelectStorePage> {
 
           // Continue Button
           Container(
-            padding: EdgeInsets.all(20),
+            padding: const EdgeInsets.all(20),
             width: double.infinity,
-            child: ElevatedButton(
-              onPressed: selectedStore == null
+            child: GestureDetector(
+              onTap: selectedStore == null
                   ? null
                   : () {
-                Get.to(() => SuccessCompletedPage(message: "Work Details Completed!"));
+                Get.to(() => SuccessCompletedPage(
+                  message: "Work Details Completed!",
+                ));
                 UploadStatus.workDetailsCompleted = true;
                 UploadStatus.saveStatus();
-
               },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: selectedStore == null
-                    ? Colors.grey.shade300
-                    : Color(0xFFF28C28),
-                padding: EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(
+              child: Container(
+                height: 55,
+                decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(14),
+                  gradient: selectedStore == null
+                      ? null
+                      : const LinearGradient(
+                    colors: [
+                      Color(0xFFF28C28),
+                      Color(0xFFE37814),
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  color: selectedStore == null
+                      ? Colors.grey.shade300
+                      : null,
+                  boxShadow: selectedStore == null
+                      ? []
+                      : [
+                    BoxShadow(
+                      color: Colors.orange.withOpacity(0.3),
+                      blurRadius: 15,
+                      offset: const Offset(0, 6),
+                    ),
+                  ],
                 ),
-              ),
-              child: Text(
-                "Continue",
-                style: TextStyle(
-                  color: selectedStore == null ? Colors.grey : Colors.white,
-                  fontSize: 16,
+                child: Center(
+                  child: Text(
+                    "Continue",
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 0.5,
+                      color: selectedStore == null
+                          ? Colors.grey
+                          : Colors.white,
+                    ),
+                  ),
                 ),
               ),
             ),
           ),
+
         ],
       ),
     );

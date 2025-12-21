@@ -51,19 +51,46 @@ class OnboardingPage extends StatelessWidget {
                   style: TextStyle(color: Colors.red),
                 ),
                 const SizedBox(height: 20),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: () {},
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Color(0xFFF28C28),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                GestureDetector(
+                  onTap: () {
+                    // TODO: submit referral code
+                    Navigator.pop(context);
+                  },
+                  child: Container(
+                    width: double.infinity,
+                    height: 55,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(14),
+                      gradient: const LinearGradient(
+                        colors: [
+                          Color(0xFFF28C28),
+                          Color(0xFFE37814),
+                        ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.orange.withOpacity(0.3),
+                          blurRadius: 15,
+                          offset: const Offset(0, 6),
+                        ),
+                      ],
+                    ),
+                    child: const Center(
+                      child: Text(
+                        "Continue",
+                        style: TextStyle(
+                          fontSize: 18,
+                          color: Colors.white,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 0.5,
+                        ),
                       ),
                     ),
-                    child: const Text("Continue", style: TextStyle(color: Colors.white),),
                   ),
-                )
+                ),
+
               ],
             ),
           );
@@ -150,27 +177,51 @@ class OnboardingPage extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 20),
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        onPressed: () {
-                          // You can now read the checkbox states here
-                          print({
-                            "dontHaveDocuments": dontHaveDocuments,
-                            "cantUploadDocuments": cantUploadDocuments,
-                            "unableToSelectStore": unableToSelectStore,
-                            "noVehicle": noVehicle
-                          });
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Color(0xFFF28C28),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
+                    GestureDetector(
+                      onTap: () {
+                        // You can now read the checkbox states here
+                        print({
+                          "dontHaveDocuments": dontHaveDocuments,
+                          "cantUploadDocuments": cantUploadDocuments,
+                          "unableToSelectStore": unableToSelectStore,
+                          "noVehicle": noVehicle,
+                        });
+                      },
+                      child: Container(
+                        width: double.infinity,
+                        height: 55,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(14),
+                          gradient: const LinearGradient(
+                            colors: [
+                              Color(0xFFF28C28),
+                              Color(0xFFE37814),
+                            ],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.orange.withOpacity(0.3),
+                              blurRadius: 15,
+                              offset: const Offset(0, 6),
+                            ),
+                          ],
+                        ),
+                        child: const Center(
+                          child: Text(
+                            "Raise Ticket",
+                            style: TextStyle(
+                              fontSize: 18,
+                              color: Colors.white,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 0.5,
+                            ),
                           ),
                         ),
-                        child: const Text("Raise Ticket", style: TextStyle(         color: Colors.white,),),
                       ),
-                    )
+                    ),
+
                   ],
                 ),
               );
@@ -182,193 +233,210 @@ class OnboardingPage extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: Colors.white,
-      body: SafeArea(
-        child: Column(
-          children: [
-            // ===================== TOP PURPLE HEADER ==========================
-            Container(
-              width: double.infinity,
-              height: 180, // 🔥 Full top area covered
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    Color(0xFFF28C28),
-                    Color(0xFFE57D20),
-                  ],
-                ),
-                borderRadius: BorderRadius.only(
-                  bottomLeft: Radius.circular(40),
-                  bottomRight: Radius.circular(40),
-                ),
+      body: Column(
+        children: [
+          // ===================== TOP PURPLE HEADER ==========================
+          Container(
+            width: double.infinity,
+            height: 180, // 🔥 Full top area covered
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Color(0xFFF28C28),
+                  Color(0xFFE57D20),
+                ],
               ),
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(20, 40, 20, 20), // 🔥 Better spacing
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // -------------------- Main Text + Badge ---------------------
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Expanded(
-                          child: Text(
-                            "Complete your\nOnboarding in 10 min",
-                            style: const TextStyle(
-                              fontFamily: 'Montserrat',
-                              fontWeight: FontWeight.w800,
-                              color: Colors.white,
-                              fontSize: 20,
+              borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(40),
+                bottomRight: Radius.circular(40),
+              ),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(20, 40, 20, 20), // 🔥 Better spacing
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // -------------------- Main Text + Badge ---------------------
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          "Complete your\nOnboarding in 10 min",
+                          style: const TextStyle(
+                            fontFamily: 'Montserrat',
+                            fontWeight: FontWeight.w800,
+                            color: Colors.white,
+                            fontSize: 20,
+                          ),
+                        ),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.all(20),
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(color: Colors.white, width: 3),
+                        ),
+                        child: Column(
+                          children: [
+                            const Text(
+                              "EARN UP TO",
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 10,
+                              ),
                             ),
-                          ),
-                        ),
-                        Container(
-                          padding: const EdgeInsets.all(20),
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            border: Border.all(color: Colors.white, width: 3),
-                          ),
-                          child: Column(
-                            children: [
-                              const Text(
-                                "EARN UP TO",
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 10,
-                                ),
+                            Text(
+                              "₹40,000",
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 20,
                               ),
-                              Text(
-                                "₹40,000",
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 20,
-                                ),
-                              ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
-
-                 //   const SizedBox(height: 10),
-
-                    // ===================== TESTIMONIAL SLIDER =====================
-                    // SizedBox(
-                    //   height: 120,
-                    //   child: ListView(
-                    //     scrollDirection: Axis.horizontal,
-                    //     children: [
-                    //       _testimonialCard(
-                    //         quote:
-                    //         "“Having been a rider for Rush Basket since 1.5 years, I'm really happy with the consistent earnings of Rush Basket”",
-                    //         name: "Syed",
-                    //         city: "Bangalore",
-                    //       ),
-                    //       _testimonialCard(
-                    //         quote:
-                    //         "“I have been working here for a year and love the stable payouts”",
-                    //         name: "Manoj",
-                    //         city: "Hyderabad",
-                    //       ),
-                    //     ],
-                    //   ),
-                    // )
-                  ],
-                ),
-              ),
-            ),
-
-
-            const SizedBox(height: 30),
-
-            // ===================== COMPLETE IN 2 STEPS =====================
-            const Text(
-              "COMPLETE IN 2 STEPS",
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                letterSpacing: 0.8,
-              ),
-            ),
-            const SizedBox(height: 40),
-
-            // STEP 1
-            _stepTile(
-              step: "1",
-              title: "Work Details",
-              subtitle: "Vehicle, City, Store",
-              onTap: () => Get.toNamed(AppRoutes.workDetails),
-              isCompleted: UploadStatus.workDetailsCompleted,
-            ),
-
-            const SizedBox(height: 12),
-
-            // STEP 2 (locked until step 1)
-            _stepTile(
-              step: "",
-              title: "Documents",
-              subtitle: "Aadhaar, PAN & Selfie",
-              onTap: () => Get.toNamed(AppRoutes.documents),
-              isCompleted: UploadStatus.documentDetailsCompleted,
-            ),
-
-            const SizedBox(height: 20),
-
-            // Referral + Help
-            TextButton.icon(
-              onPressed: () => _showReferralCodeSheet(context),
-              icon: const Icon(Icons.card_giftcard, color:  Color(0xFFF28C28),),
-              label: const Text(
-                "Have a Referral Code?",
-                style: TextStyle(
-                  color:  Color(0xFFF28C28),
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-            TextButton.icon(
-              onPressed: () => _showHelpSupportSheet(context),
-              icon: const Icon(Icons.help_outline, color:  Color(0xFFF28C28),),
-              label: const Text(
-                "Need Help?",
-                style: TextStyle(
-                  color:  Color(0xFFF28C28),
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-
-            const Spacer(),
-
-            // ===================== CONTINUE BUTTON =====================
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
-              child: ElevatedButton(
-                onPressed: () => Get.to(() => OrdersPage()),
-
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const  Color(0xFFF28C28),
-                   // Color(0xFFE57D16),
-                  padding: const EdgeInsets.symmetric(vertical: 15),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14),
+                      ),
+                    ],
                   ),
+
+               //   const SizedBox(height: 10),
+
+                  // ===================== TESTIMONIAL SLIDER =====================
+                  // SizedBox(
+                  //   height: 120,
+                  //   child: ListView(
+                  //     scrollDirection: Axis.horizontal,
+                  //     children: [
+                  //       _testimonialCard(
+                  //         quote:
+                  //         "“Having been a rider for Rush Basket since 1.5 years, I'm really happy with the consistent earnings of Rush Basket”",
+                  //         name: "Syed",
+                  //         city: "Bangalore",
+                  //       ),
+                  //       _testimonialCard(
+                  //         quote:
+                  //         "“I have been working here for a year and love the stable payouts”",
+                  //         name: "Manoj",
+                  //         city: "Hyderabad",
+                  //       ),
+                  //     ],
+                  //   ),
+                  // )
+                ],
+              ),
+            ),
+          ),
+
+
+          const SizedBox(height: 30),
+
+          // ===================== COMPLETE IN 2 STEPS =====================
+          const Text(
+            "COMPLETE IN 2 STEPS",
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              letterSpacing: 0.8,
+            ),
+          ),
+          const SizedBox(height: 40),
+
+          // STEP 1
+          _stepTile(
+            step: "1",
+            title: "Work Details",
+            subtitle: "Vehicle, City, Store",
+            onTap: () => Get.toNamed(AppRoutes.workDetails),
+            isCompleted: UploadStatus.workDetailsCompleted,
+          ),
+
+          const SizedBox(height: 12),
+
+          // STEP 2 (locked until step 1)
+          _stepTile(
+            step: "2",
+            title: "Documents",
+            subtitle: "Aadhaar, PAN & Selfie",
+            onTap: () => Get.toNamed(AppRoutes.documents),
+            isCompleted: UploadStatus.documentDetailsCompleted,
+          ),
+
+          const SizedBox(height: 20),
+
+          // Referral + Help
+          TextButton.icon(
+            onPressed: () => _showReferralCodeSheet(context),
+            icon: const Icon(Icons.card_giftcard, color:   Color(0xFF4A76B9),),
+            label: const Text(
+              "Have a Referral Code?",
+              style: TextStyle(
+                color:  Color(0xFF4A76B9),
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+          TextButton.icon(
+            onPressed: () => _showHelpSupportSheet(context),
+            icon: const Icon(Icons.help_outline, color:   Color(0xFF4A76B9),),
+            label: const Text(
+              "Need Help?",
+              style: TextStyle(
+                color:   Color(0xFF4A76B9),
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+
+          const Spacer(),
+
+          // ===================== CONTINUE BUTTON =====================
+          Padding(
+            padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+            child: GestureDetector(
+              onTap: () => Get.to(() => OrdersPage()),
+              child: Container(
+                width: double.infinity,
+                height: 55,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(14),
+                  gradient: const LinearGradient(
+                    colors: [
+                      Color(0xFFF28C28),
+                      Color(0xFFE37814),
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.orange.withOpacity(0.3),
+                      blurRadius: 15,
+                      offset: const Offset(0, 6),
+                    ),
+                  ],
                 ),
                 child: const Center(
                   child: Text(
                     "Continue",
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: Colors.white,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 0.5,
+                    ),
                   ),
                 ),
               ),
-            )
-          ],
-        ),
+            ),
+          ),
+
+        ],
       ),
     );
   }
@@ -434,14 +502,24 @@ class OnboardingPage extends StatelessWidget {
           children: [
             CircleAvatar(
               radius: 18,
-              backgroundColor: isCompleted ? Colors.green.shade100 : Colors.white,
-              child: isCompleted ? const Icon(Icons.check, color: Colors.green, size: 22)
+              backgroundColor: isCompleted
+                  ? const Color(0xFF4A76B9).withOpacity(0.15)
+                  : Colors.white,
+              child: isCompleted
+                  ? const Icon(
+                Icons.check,
+                color: Color(0xFF1A3C6E),
+                size: 22,
+              )
                   : Text(
                 step,
                 style: const TextStyle(
-                    color: Colors.black, fontWeight: FontWeight.bold),
+                  color: Color(0xFF1A3C6E),
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
+
             const SizedBox(width: 14),
 
             // Title + Subtitle

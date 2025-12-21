@@ -239,6 +239,16 @@ class _PersonalInformationPageState extends State<PersonalInformationPage> {
     "Sanskrit",
   ];
 
+  final List<String> bloodGroups = [
+    'A+',
+    'A-',
+    'B+',
+    'B-',
+    'AB+',
+    'AB-',
+    'O+',
+    'O-',
+  ];
 
 
   @override
@@ -276,11 +286,13 @@ class _PersonalInformationPageState extends State<PersonalInformationPage> {
 
                   const SizedBox(height: 5),
 
-                  _buildTextField(
-                    nameController,
-                    "Enter your name (Same as PAN Card)",
-                    true,
+                  _glassTextField(
+                    controller: nameController,
+                    hint: "Enter your name (Same as PAN Card)",
+                    icon: Icons.person,
+                    required: true,
                   ),
+
                   const SizedBox(height: 10),
                   const Text(
                     "Father's Name",
@@ -291,7 +303,12 @@ class _PersonalInformationPageState extends State<PersonalInformationPage> {
                   ),
 
                   const SizedBox(height: 5),
-                  _buildTextField(fatherNameController, "Enter father's name", true),
+                  _glassTextField(
+                    controller: fatherNameController,
+                    hint: "Enter father's name",
+                    icon: Icons.person_outline,
+                    required: true,
+                  ),
                   const SizedBox(height: 10),
                   const Text(
                     "Mother's Name",
@@ -302,7 +319,12 @@ class _PersonalInformationPageState extends State<PersonalInformationPage> {
                   ),
 
                   const SizedBox(height: 5),
-                  _buildTextField(motherNameController, "Enter mother's name", true),
+                  _glassTextField(
+                    controller: motherNameController,
+                    hint: "Enter mother's name",
+                    icon: Icons.person_outline,
+                    required: true,
+                  ),
                   const SizedBox(height: 10),
                   const Text(
                     "Date Of Birth",
@@ -313,7 +335,54 @@ class _PersonalInformationPageState extends State<PersonalInformationPage> {
                   ),
 
                   const SizedBox(height: 5),
-                  _buildDateField(),
+                  _glassTextField(
+                    controller: dobController,
+                    hint: "DD-MM-YYYY",
+                    icon: Icons.calendar_today,
+                    readOnly: true,
+                    required: true,
+                    onTap: () async {
+                      FocusScope.of(context).unfocus();
+
+                      DateTime? picked = await showDatePicker(
+                        context: context,
+                        initialDate: DateTime(2000),
+                        firstDate: DateTime(1900),
+                        lastDate: DateTime.now(),
+
+                        builder: (context, child) {
+                          return Theme(
+                            data: Theme.of(context).copyWith(
+                              colorScheme: const ColorScheme.light(
+                                primary: Color(0xFFF28C28),   // 🟧 Orange header & buttons
+                                onPrimary: Colors.white,      // White text on orange
+                                onSurface: Colors.black,      // Dates text color
+                              ),
+                              dialogBackgroundColor: Colors.white,
+                              textButtonTheme: TextButtonThemeData(
+                                style: TextButton.styleFrom(
+                                  foregroundColor: Color(0xFFF28C28),
+                                ),
+                              ),
+                            ),
+                            child: child!,
+                          );
+                        },
+                      );
+
+                      if (picked != null) {
+                        dobController.text =
+                        "${picked.day.toString().padLeft(2, '0')}-"
+                            "${picked.month.toString().padLeft(2, '0')}-"
+                            "${picked.year}";
+
+                        ageController.text =
+                            _calculateAge(dobController.text).toString();
+                      }
+                    },
+                  ),
+
+
                   const SizedBox(height: 10),
                   const Text(
                     "Age",
@@ -324,7 +393,13 @@ class _PersonalInformationPageState extends State<PersonalInformationPage> {
                   ),
 
                   const SizedBox(height: 5),
-                  _buildTextField(ageController, "Age", true, readOnly: true),
+                  _glassTextField(
+                    controller: ageController,
+                    hint: "Age",
+                    icon: Icons.cake,
+                    readOnly: true,
+                  ),
+
                   const SizedBox(height: 10),
                   const Text(
                     "Mobile Number",
@@ -335,7 +410,15 @@ class _PersonalInformationPageState extends State<PersonalInformationPage> {
                   ),
 
                   const SizedBox(height: 5),
-                  _buildMobileField(primaryMobileController, "Mobile Number", true),
+                  _glassTextField(
+                    controller: primaryMobileController,
+                    hint: "Mobile Number",
+                    icon: Icons.phone_rounded,
+                    keyboardType: TextInputType.number,
+                    maxLength: 10,
+                    required: true,
+                  ),
+
                   const SizedBox(height: 10),
                   const Text(
                     "WhatsApp Number",
@@ -346,7 +429,14 @@ class _PersonalInformationPageState extends State<PersonalInformationPage> {
                   ),
 
                   const SizedBox(height: 5),
-                  _buildMobileField(whatsappController, "WhatsApp Number", true),
+                  _glassTextField(
+                    controller: whatsappController,
+                    hint: "WhatsApp Number",
+                    icon: Icons.phone_rounded,
+                    keyboardType: TextInputType.number,
+                    maxLength: 10,
+                    required: true,
+                  ),
                   // _buildMobileField(secondaryMobileController, "Secondary Mobile Number", false),
                   const SizedBox(height: 10),
                   const Text(
@@ -356,9 +446,27 @@ class _PersonalInformationPageState extends State<PersonalInformationPage> {
                       fontWeight: FontWeight.w600,
                     ),
                   ),
-
                   const SizedBox(height: 5),
-                  _buildTextField(bloodGroupController, "Enter Blood Group", true),
+                  _glassContainer(
+                    child: DropdownSearch<String>(
+                      items: bloodGroups,
+                      selectedItem: bloodGroupController.text.isNotEmpty
+                          ? bloodGroupController.text
+                          : null,
+                      dropdownDecoratorProps: const DropDownDecoratorProps(
+                        dropdownSearchDecoration: InputDecoration(
+                          border: InputBorder.none,
+                          hintText: "Select Blood Group",
+                        ),
+                      ),
+                      onChanged: (value) {
+                        bloodGroupController.text = value ?? "";
+                      },
+                    ),
+                  ),
+
+
+
                   //_buildTextField(cityController, "Enter your city", true),
                   const SizedBox(height: 10),
                   const Text(
@@ -370,7 +478,50 @@ class _PersonalInformationPageState extends State<PersonalInformationPage> {
                   ),
 
                   const SizedBox(height: 5),
-                  _buildCityDropdown(),
+                  _glassContainer(
+                    child: DropdownSearch<String>(
+                      items: indianCities,
+                      selectedItem: cityController.text.isNotEmpty
+                          ? cityController.text
+                          : null,
+
+                      popupProps: PopupProps.menu(
+                        showSearchBox: true,
+
+                        // White popup background
+                        containerBuilder: (ctx, popupWidget) {
+                          return Container(
+                            color: Colors.white,
+                            child: popupWidget,
+                          );
+                        },
+
+                        searchFieldProps: TextFieldProps(
+                          decoration: InputDecoration(
+                            hintText: "Search city",
+                            filled: true,
+                            fillColor: Colors.white,
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                        ),
+                      ),
+
+                      dropdownDecoratorProps: const DropDownDecoratorProps(
+                        dropdownSearchDecoration: InputDecoration(
+                          border: InputBorder.none,
+                          hintText: "Select City",
+                        ),
+                      ),
+
+                      onChanged: (value) {
+                        cityController.text = value ?? "";
+                      },
+                    ),
+                  ),
+
+
                   const SizedBox(height: 10),
                   const Text(
                     "Current Address",
@@ -381,7 +532,12 @@ class _PersonalInformationPageState extends State<PersonalInformationPage> {
                   ),
 
                   const SizedBox(height: 5),
-                  _buildTextField(addressController, "Current address", true),
+                  _glassTextField(
+                    controller: addressController,
+                    hint: "Current Address",
+                    icon: Icons.home_filled,
+                    required: true,
+                  ),
                   const SizedBox(height: 10),
                   const Text(
                     "Language",
@@ -392,7 +548,24 @@ class _PersonalInformationPageState extends State<PersonalInformationPage> {
                   ),
 
                   const SizedBox(height: 5),
-                  _buildLanguageDropdown(),
+                  _glassContainer(
+                    child: DropdownSearch<String>.multiSelection(
+                      items: languagesList,
+                      dropdownDecoratorProps: const DropDownDecoratorProps(
+                        dropdownSearchDecoration: InputDecoration(
+                          border: InputBorder.none,
+                          hintText: "Select Languages",
+                        ),
+                      ),
+                      onChanged: (values) {
+                        languagesController.text = values.join(", ");
+                      },
+                      selectedItems: languagesController.text.isNotEmpty
+                          ? languagesController.text.split(", ")
+                          : [],
+                    ),
+                  ),
+
                   //const SizedBox(height: 12),
                   // Emergency Contact Fields
                   const SizedBox(height: 10),
@@ -405,7 +578,13 @@ class _PersonalInformationPageState extends State<PersonalInformationPage> {
                   ),
 
                   const SizedBox(height: 5),
-                  _buildTextField(emergencyNameController, "Emergency Contact Person Name", true),
+
+                  _glassTextField(
+                    controller: emergencyNameController,
+                    hint: "Emergency Contact Person Name",
+                    icon: Icons.person_outline,
+                    required: true,
+                  ),
                   const SizedBox(height: 10),
                   const Text(
                     "Emergency Contact Number",
@@ -416,42 +595,75 @@ class _PersonalInformationPageState extends State<PersonalInformationPage> {
                   ),
 
                   const SizedBox(height: 5),
-                  _buildMobileField(emergencyNumberController, "Emergency Contact Number", true),
-                  const SizedBox(height: 16),
-                  _buildProfilePicture(),
-                  const SizedBox(height: 20),
-                  const Text(
-                    "Referral Code (Optional)",
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600,
-                    ),
+                  _glassTextField(
+                    controller: emergencyNumberController,
+                    hint: "Emergency Contact Number",
+                    icon: Icons.phone_rounded,
+                    keyboardType: TextInputType.number,
+                    maxLength: 10,
+                    required: true,
                   ),
+                  const SizedBox(height: 16),
+                  // _buildProfilePicture(),
+                  // const SizedBox(height: 20),
+                  // const Text(
+                  //   "Referral Code (Optional)",
+                  //   style: TextStyle(
+                  //     fontSize: 15,
+                  //     fontWeight: FontWeight.w600,
+                  //   ),
+                  // ),
 
-                  const SizedBox(height: 5),
-                  _buildTextField(referralCodeController, "Enter referral code (Optional)", false),
+                  // const SizedBox(height: 5),
+                  // _buildTextField(referralCodeController, "Enter referral code (Optional)", false),
+                  //
                 ],
               ),
 
 
 
-              const SizedBox(height: 24),
-              SizedBox(
-                width: double.infinity,
-                height: 50,
-                child: ElevatedButton(
-                  onPressed: () {
-                    if (_formKey.currentState!.validate()) {
-                      Get.toNamed(AppRoutes.onboarding);
-                    }
-                  },
-                  style: ElevatedButton.styleFrom(
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                    backgroundColor: Colors.orange,
+              // const SizedBox(height: 24),
+              GestureDetector(
+                onTap: () {
+                  if (_formKey.currentState!.validate()) {
+                    Get.toNamed(AppRoutes.onboarding);
+                  }
+                },
+                child: Container(
+                  width: double.infinity,
+                  height: 55,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(14),
+                    gradient: const LinearGradient(
+                      colors: [
+                        Color(0xFFF28C28),
+                        Color(0xFFE37814),
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.orange.withOpacity(0.3),
+                        blurRadius: 15,
+                        offset: const Offset(0, 6),
+                      ),
+                    ],
                   ),
-                  child: const Text("Submit", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.white)),
+                  child: const Center(
+                    child: Text(
+                      "Submit",
+                      style: TextStyle(
+                        fontSize: 18,
+                        color: Colors.white,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                  ),
                 ),
               ),
+
             ],
           ),
         ),
@@ -695,6 +907,58 @@ class _PersonalInformationPageState extends State<PersonalInformationPage> {
   }
 
 
+  Widget _buildBloodGroupDropdown() {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: DropdownSearch<String>(
+        items: bloodGroups,
+        selectedItem: bloodGroupController.text.isNotEmpty
+            ? bloodGroupController.text
+            : null,
+
+        popupProps: PopupProps.menu(
+          showSearchBox: true,
+
+          // 🔥 White popup background
+          containerBuilder: (ctx, popupWidget) {
+            return Container(
+              color: Colors.white,
+              child: popupWidget,
+            );
+          },
+
+          searchFieldProps: TextFieldProps(
+            decoration: InputDecoration(
+              hintText: "Search blood group",
+              filled: true,
+              fillColor: Colors.white,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+          ),
+        ),
+
+        dropdownDecoratorProps: DropDownDecoratorProps(
+          dropdownSearchDecoration: InputDecoration(
+            hintText: "Select Blood Group",
+            filled: true,
+            fillColor: Colors.white,
+            contentPadding:
+            const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide.none,
+            ),
+          ),
+        ),
+
+        onChanged: (value) {
+          bloodGroupController.text = value ?? "";
+        },
+      ),
+    );
+  }
 
 
 
@@ -763,6 +1027,78 @@ class _PersonalInformationPageState extends State<PersonalInformationPage> {
       });
     }
   }
- }
+  Widget _glassTextField({
+    required TextEditingController controller,
+    required String hint,
+    IconData? icon,
+    bool required = false,
+    bool readOnly = false,
+    TextInputType keyboardType = TextInputType.text,
+    int? maxLength,
+    VoidCallback? onTap,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 14),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 6),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16),
+          color: Colors.white.withOpacity(0.95),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.08),
+              blurRadius: 18,
+              offset: const Offset(0, 6),
+            ),
+          ],
+        ),
+        child: TextFormField(
+          controller: controller,
+          readOnly: readOnly,
+          keyboardType: keyboardType,
+          maxLength: maxLength,
+          onTap: onTap,
+          textCapitalization: TextCapitalization.words,
+          validator: required
+              ? (value) => value == null || value.isEmpty ? "Required" : null
+              : null,
+          decoration: InputDecoration(
+            border: InputBorder.none,
+            counterText: "",
+            prefixIcon: icon != null
+                ? Icon(icon, color: const Color(0xFFF28C28), size: 24)
+                : null,
+            hintText: hint,
+            hintStyle: const TextStyle(
+              fontSize: 16,
+              color: Colors.grey,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+  Widget _glassContainer({required Widget child}) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 14),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 6),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16),
+          color: Colors.white.withOpacity(0.95),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.08),
+              blurRadius: 18,
+              offset: const Offset(0, 6),
+            ),
+          ],
+        ),
+        child: child,
+      ),
+    );
+  }
+
+}
 
 

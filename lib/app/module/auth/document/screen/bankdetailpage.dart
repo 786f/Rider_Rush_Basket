@@ -177,6 +177,7 @@ class _BankDetailPageState extends State<BankDetailPage> {
         List<TextInputFormatter>? inputFormatters,
         TextCapitalization textCapitalization = TextCapitalization.none,
         String? hintText,
+        int maxLines = 1,
       }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -184,7 +185,10 @@ class _BankDetailPageState extends State<BankDetailPage> {
         Text(
           label,
           style: const TextStyle(
-              fontWeight: FontWeight.bold, fontSize: 14, color: Colors.black87),
+            fontWeight: FontWeight.w600,
+            fontSize: 14,
+            color: Colors.black87,
+          ),
         ),
         const SizedBox(height: 6),
         TextField(
@@ -192,23 +196,33 @@ class _BankDetailPageState extends State<BankDetailPage> {
           keyboardType: keyboardType,
           inputFormatters: inputFormatters,
           textCapitalization: textCapitalization,
+          maxLines: maxLines,
+          style: const TextStyle(fontSize: 14, color: Colors.black87),
           decoration: InputDecoration(
             hintText: hintText,
-            hintStyle: const TextStyle(color: Colors.grey),
+            hintStyle: TextStyle(color: Colors.grey.shade400),
             filled: true,
             fillColor: Colors.white,
+            contentPadding:
+            const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(14),
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide.none, // No visible border
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide.none,
             ),
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(14),
-              borderSide: const BorderSide(color: Color(0xFFF28C28)),
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: Color(0xFFF28C28), width: 2),
             ),
           ),
         ),
       ],
     );
   }
+
 }
 
 // Forces IFSC code to uppercase

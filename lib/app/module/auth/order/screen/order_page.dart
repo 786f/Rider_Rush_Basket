@@ -196,12 +196,13 @@ class _OrdersPageState extends State<OrdersPage> {
         children: [
           const SizedBox(height: 20),
 
-          // Meal / Store Row
+          // Store Row + Date Picker
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
+                // Only Store tab container (can even remove the row if not needed)
                 Container(
                   padding: const EdgeInsets.all(4),
                   decoration: BoxDecoration(
@@ -215,21 +216,14 @@ class _OrdersPageState extends State<OrdersPage> {
                       ),
                     ],
                   ),
-                  child: Row(
-                    children: [
-                      _smallTab("Meal", 0, mealStoreTab),
-                      const SizedBox(width: 6),
-                      _smallTab("Store", 1, mealStoreTab),
-                    ],
-                  ),
+                  child: _smallTab("Store", 0, 0), // Only Store tab, fixed index
                 ),
 
                 // Date Picker
                 GestureDetector(
                   onTap: _pickDate,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 10),
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(20),
@@ -264,17 +258,12 @@ class _OrdersPageState extends State<OrdersPage> {
 
           Expanded(
             child: selectedTab == 0
-                ? (mealStoreTab == 0
-                ? _newOrdersList(mealNewOrders, isMeal: true)
-                : _newOrdersList(newOrders))
+                ? _newOrdersList(newOrders) // Only Store new orders
                 : selectedTab == 1
-                ? (mealStoreTab == 0
-                ? _activeOrdersList(mealActiveOrders, isMeal: true)
-                : _activeOrdersList(activeOrders))
-                : (mealStoreTab == 0
-                ? _completedOrdersList(mealCompletedOrders)
-                : _completedOrdersList(completedOrders)),
+                ? _activeOrdersList(activeOrders) // Only Store active orders
+                : _completedOrdersList(completedOrders), // Only Store completed orders
           ),
+
         ],
       ),
     );
@@ -383,33 +372,34 @@ class _OrdersPageState extends State<OrdersPage> {
           const SizedBox(height: 16),
           Row(
             children: [
-              _btn("Reject", Colors.redAccent, Colors.white, () {}),
-              const SizedBox(width: 12),
-              _btn("Accept", const Color(0xFFF28C28), Colors.white, () {
+              // Reject button: removes order from newOrders list
+              _btn("Reject", Color(0xFF1A3C6E), Colors.white, () {
                 setState(() {
-                  if (isMeal) {
-                    mealActiveOrders.add({
-                      "orderId": "#M${DateTime.now().millisecondsSinceEpoch}",
-                      "stageIndex": 0,
-                      "pickup": order["pickup"],
-                      "drop": order["drop"],
-                      "earnings": order["pay"]
-                    });
-                  } else {
-                    activeOrders.add({
-                      "orderId": "#${DateTime.now().millisecondsSinceEpoch}",
-                      "stageIndex": 0,
-                      "pickup": order["pickup"],
-                      "drop": order["drop"],
-                      "earnings": order["pay"]
-                    });
-                  }
+                  parentList.remove(order); // Remove the order from the list
+                });
+              }),
 
+              const SizedBox(width: 12),
+
+              // Accept button: moves order to activeOrders
+              _btn("Accept", const  Color(0xFFE57D16), Colors.white, () {
+                setState(() {
+                  // Add the order to activeOrders
+                  activeOrders.add({
+                    "orderId": "#${DateTime.now().millisecondsSinceEpoch}",
+                    "stageIndex": 0,
+                    "pickup": order["pickup"],
+                    "drop": order["drop"],
+                    "earnings": order["pay"]
+                  });
+
+                  // Remove from newOrders
                   parentList.remove(order);
                 });
               }),
             ],
           )
+
         ],
       ),
     );

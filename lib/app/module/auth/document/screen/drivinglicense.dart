@@ -239,12 +239,8 @@ class _DrivingLicenseUploadPageState extends State<DrivingLicenseUploadPage> {
             TextField(
               controller: licenseController,
               keyboardType: TextInputType.text,
-              inputFormatters: [
-                FilteringTextInputFormatter.allow(RegExp(r'[A-Za-z0-9]')),
-                LengthLimitingTextInputFormatter(16),
-              ],
               decoration: InputDecoration(
-                hintText: "Enter DL number (UP-14-1234567890)",
+                hintText: "Enter DL number",
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),

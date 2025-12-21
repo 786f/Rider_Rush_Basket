@@ -35,13 +35,13 @@ class _SuccessCompletedPageState extends State<SuccessCompletedPage> {
             // ✔️ Success Icon
             Container(
               decoration: BoxDecoration(
-                color: Colors.green.shade50,
+                color: Color(0xFF4A76B9).withOpacity(0.15),
                 shape: BoxShape.circle,
               ),
               padding: const EdgeInsets.all(25),
               child: const Icon(
                 Icons.check_circle,
-                color: Colors.green,
+                color: Color(0xFF1A3C6E),
                 size: 100,
               ),
             ),

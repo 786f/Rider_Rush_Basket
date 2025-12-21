@@ -5,6 +5,7 @@ import 'package:get/get_navigation/get_navigation.dart';
 import 'package:riderrushbasketapp/app/module/auth/order/screen/accountpage/supportpage.dart';
 
 import '../../../../widget/bottomnav.dart';
+import '../../document/screen/bankdetailpage.dart';
 import '../../login/controller/login_controller.dart';
 import '../../login/screen/login_page.dart';
 import '../../onboarding/screen/onboarding_screen.dart';
@@ -174,6 +175,10 @@ class AccountPage extends StatelessWidget {
             _optionTile(Icons.person_outline, "Edit Profile", () {
               Get.to(() => EditProfilePage());
             }),
+            _optionTile(Icons.account_balance, "Bank Details", () {
+              Get.to(() => BankDetailPage(isEditing: false));
+            }),
+
             _optionTile(Icons.account_balance_wallet_outlined, "Wallet", () {
               Get.to(() => const WalletPage());
             }),

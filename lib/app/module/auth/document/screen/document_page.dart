@@ -339,55 +339,92 @@ class _CompletedTileState extends State<CompletedTile> {
 
   Widget _deleteDialog() {
     return Dialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      backgroundColor: Colors.white,
       child: Padding(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(24),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.warning, size: 50, color: Colors.red),
-            SizedBox(height: 12),
-
-            Text(
-              "Delete Document?",
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            // Warning icon with modern style
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.orange.shade100,
+                shape: BoxShape.circle,
+              ),
+              padding: const EdgeInsets.all(16),
+              child: Icon(Icons.warning_amber_rounded, size: 40, color: Colors.orange),
             ),
 
-            SizedBox(height: 10),
+            const SizedBox(height: 20),
 
+            // Title
+            Text(
+              "Delete Document?",
+              style: TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+                color: Colors.black87,
+              ),
+            ),
+
+            const SizedBox(height: 12),
+
+            // Description
             Text(
               "Are you sure you want to delete this document? "
                   "You will need to upload it again.",
               textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 15,
+                color: Colors.black54,
+              ),
             ),
 
-            SizedBox(height: 25),
+            const SizedBox(height: 25),
 
+            // Buttons
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                // CANCEL
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.grey.shade300,
-                    foregroundColor: Colors.black,
+                // Cancel Button
+                Expanded(
+                  child: OutlinedButton(
+                    style: OutlinedButton.styleFrom(
+                      side: BorderSide(color: Colors.orange.shade300),
+                      backgroundColor: Colors.white,
+                      foregroundColor: Colors.orange,
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    onPressed: () => Navigator.pop(context, false),
+                    child: const Text(
+                      "Cancel",
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
                   ),
-                  onPressed: () {
-                    Navigator.pop(context, false);
-                  },
-                  child: Text("Cancel"),
                 ),
 
-                // DELETE
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.red,
-                    foregroundColor: Colors.white,
+                const SizedBox(width: 16),
+
+                // Delete Button
+                Expanded(
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF1A3C6E), // Blue
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    onPressed: () => Navigator.pop(context, true),
+                    child: const Text(
+                      "Delete",
+                      style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+                    ),
                   ),
-                  onPressed: () {
-                    Navigator.pop(context, true);
-                  },
-                  child: Text("Delete"),
                 ),
               ],
             ),
@@ -396,6 +433,7 @@ class _CompletedTileState extends State<CompletedTile> {
       ),
     );
   }
+
 
 
   @override

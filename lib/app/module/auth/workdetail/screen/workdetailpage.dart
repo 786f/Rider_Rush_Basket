@@ -188,24 +188,44 @@ class _WorkDetailsPageState extends State<WorkDetailsPage> {
           // =================== CONTINUE BUTTON =====================
           Padding(
             padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
-            child: ElevatedButton(
-              onPressed: () => Get.to(() => SelectCityPage()),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const  Color(0xFFF28C28),
-                // Color(0xFFE57D16),
-                padding: const EdgeInsets.symmetric(vertical: 15),
-                shape: RoundedRectangleBorder(
+            child: GestureDetector(
+              onTap: () => Get.to(() => SelectCityPage()),
+              child: Container(
+                width: double.infinity,
+                height: 55,
+                decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(14),
+                  gradient: const LinearGradient(
+                    colors: [
+                      Color(0xFFF28C28),
+                      Color(0xFFE37814),
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.orange.withOpacity(0.3),
+                      blurRadius: 15,
+                      offset: const Offset(0, 6),
+                    ),
+                  ],
                 ),
-              ),
-              child: const Center(
-                child: Text(
-                  "Continue",
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
+                child: const Center(
+                  child: Text(
+                    "Continue",
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: Colors.white,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 0.5,
+                    ),
+                  ),
                 ),
               ),
             ),
           ),
+
         ],
       ),
     );
