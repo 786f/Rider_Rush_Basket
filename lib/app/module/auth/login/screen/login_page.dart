@@ -167,40 +167,30 @@ class LoginPage extends GetView<LoginController> {
                     // 🌟 PREMIUM GRADIENT BUTTON
                     GestureDetector(
                       onTap: controller.sendOtp,
-                      child: Container(
+                      child: Obx(() => Container(
                         width: double.infinity,
                         height: 55,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(14),
                           gradient: const LinearGradient(
-                            colors: [
-                              Color(0xFFF28C28),
-                              Color(0xFFE37814),
-                            ],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
+                            colors: [Color(0xFFF28C28), Color(0xFFE37814)],
                           ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.orange.withOpacity(0.3),
-                              blurRadius: 15,
-                              offset: const Offset(0, 6),
-                            ),
-                          ],
                         ),
-                        child: const Center(
-                          child: Text(
+                        child: Center(
+                          child: controller.isLoading.value
+                              ? const CircularProgressIndicator(color: Colors.white)
+                              : const Text(
                             "Send OTP",
                             style: TextStyle(
                               fontSize: 18,
                               color: Colors.white,
                               fontWeight: FontWeight.w700,
-                              letterSpacing: 0.5,
                             ),
                           ),
                         ),
-                      ),
+                      )),
                     ),
+
 
                     const SizedBox(height: 30),
 
