@@ -21,7 +21,7 @@ android {
 
     defaultConfig {
         applicationId "com.example.riderrushbasketapp"
-        minSdk 21
+        minSdkVersion flutter.minSdkVersion
         targetSdk 34
 
         versionCode flutter.versionCode

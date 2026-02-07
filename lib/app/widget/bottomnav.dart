@@ -39,7 +39,7 @@ class BottomNav extends StatelessWidget {
               if (currentIndex != 0) {
                 Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(builder: (_) => const OnboardingPage()),
+                  MaterialPageRoute(builder: (_) =>  OnboardingPage()),
                 );
               }
             },

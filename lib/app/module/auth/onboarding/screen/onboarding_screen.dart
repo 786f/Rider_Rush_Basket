@@ -5,9 +5,12 @@ import 'package:get/get.dart';
 import '../../../../routes/app_routes.dart';
 import '../../document/screen/document_upload_status.dart';
 import '../../order/screen/order_page.dart';
+import '../../personal/personal_info_controller.dart';
 
 class OnboardingPage extends StatelessWidget {
-  const OnboardingPage({super.key});
+   OnboardingPage({super.key});
+
+  final PersonalInfoController controller = Get.put(PersonalInfoController());
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +25,7 @@ class OnboardingPage extends StatelessWidget {
       showModalBottomSheet(
         backgroundColor: Colors.white,
         context: context,
-        isScrollControlled: true, // for bigger content
+        isScrollControlled: true,
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
         ),
@@ -52,9 +55,8 @@ class OnboardingPage extends StatelessWidget {
                 ),
                 const SizedBox(height: 20),
                 GestureDetector(
-                  onTap: () {
-                    // TODO: submit referral code
-                    Navigator.pop(context);
+                  onTap: () async {
+                    await controller.createProfile();
                   },
                   child: Container(
                     width: double.infinity,
@@ -79,7 +81,7 @@ class OnboardingPage extends StatelessWidget {
                     ),
                     child: const Center(
                       child: Text(
-                        "Continue",
+                        "Create Profile",
                         style: TextStyle(
                           fontSize: 18,
                           color: Colors.white,
@@ -91,6 +93,7 @@ class OnboardingPage extends StatelessWidget {
                   ),
                 ),
 
+
               ],
             ),
           );
@@ -98,7 +101,6 @@ class OnboardingPage extends StatelessWidget {
       );
     }
 
-    // Help & Support Bottom Sheet
     void _showHelpSupportSheet(BuildContext context) {
       showModalBottomSheet(
         backgroundColor: Colors.white,
@@ -108,10 +110,8 @@ class OnboardingPage extends StatelessWidget {
           borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
         ),
         builder: (_) {
-          // Use StatefulBuilder to manage state inside the bottom sheet
           return StatefulBuilder(
             builder: (BuildContext context, StateSetter setState) {
-              // Local variables for checkboxes
               bool dontHaveDocuments = false;
               bool cantUploadDocuments = false;
               bool unableToSelectStore = false;
@@ -179,7 +179,6 @@ class OnboardingPage extends StatelessWidget {
                     const SizedBox(height: 20),
                     GestureDetector(
                       onTap: () {
-                        // You can now read the checkbox states here
                         print({
                           "dontHaveDocuments": dontHaveDocuments,
                           "cantUploadDocuments": cantUploadDocuments,
@@ -235,10 +234,9 @@ class OnboardingPage extends StatelessWidget {
       backgroundColor: Colors.white,
       body: Column(
         children: [
-          // ===================== TOP PURPLE HEADER ==========================
           Container(
             width: double.infinity,
-            height: 180, // 🔥 Full top area covered
+            height: 180,
             decoration: const BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
@@ -254,11 +252,10 @@ class OnboardingPage extends StatelessWidget {
               ),
             ),
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(20, 40, 20, 20), // 🔥 Better spacing
+              padding: const EdgeInsets.fromLTRB(20, 40, 20, 20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // -------------------- Main Text + Badge ---------------------
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -305,38 +302,12 @@ class OnboardingPage extends StatelessWidget {
                     ],
                   ),
 
-               //   const SizedBox(height: 10),
-
-                  // ===================== TESTIMONIAL SLIDER =====================
-                  // SizedBox(
-                  //   height: 120,
-                  //   child: ListView(
-                  //     scrollDirection: Axis.horizontal,
-                  //     children: [
-                  //       _testimonialCard(
-                  //         quote:
-                  //         "“Having been a rider for Rush Basket since 1.5 years, I'm really happy with the consistent earnings of Rush Basket”",
-                  //         name: "Syed",
-                  //         city: "Bangalore",
-                  //       ),
-                  //       _testimonialCard(
-                  //         quote:
-                  //         "“I have been working here for a year and love the stable payouts”",
-                  //         name: "Manoj",
-                  //         city: "Hyderabad",
-                  //       ),
-                  //     ],
-                  //   ),
-                  // )
                 ],
               ),
             ),
           ),
 
-
           const SizedBox(height: 30),
-
-          // ===================== COMPLETE IN 2 STEPS =====================
           const Text(
             "COMPLETE IN 2 STEPS",
             style: TextStyle(
@@ -347,7 +318,6 @@ class OnboardingPage extends StatelessWidget {
           ),
           const SizedBox(height: 40),
 
-          // STEP 1
           _stepTile(
             step: "1",
             title: "Work Details",
@@ -358,18 +328,17 @@ class OnboardingPage extends StatelessWidget {
 
           const SizedBox(height: 12),
 
-          // STEP 2 (locked until step 1)
           _stepTile(
             step: "2",
             title: "Documents",
             subtitle: "Aadhaar, PAN & Selfie",
             onTap: () => Get.toNamed(AppRoutes.documents),
+
             isCompleted: UploadStatus.documentDetailsCompleted,
           ),
 
           const SizedBox(height: 20),
 
-          // Referral + Help
           TextButton.icon(
             onPressed: () => _showReferralCodeSheet(context),
             icon: const Icon(Icons.card_giftcard, color:   Color(0xFF4A76B9),),
@@ -395,11 +364,12 @@ class OnboardingPage extends StatelessWidget {
 
           const Spacer(),
 
-          // ===================== CONTINUE BUTTON =====================
           Padding(
             padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
             child: GestureDetector(
-              onTap: () => Get.to(() => OrdersPage()),
+              onTap: () async {
+                await controller.createProfile();
+              },
               child: Container(
                 width: double.infinity,
                 height: 55,
@@ -423,7 +393,7 @@ class OnboardingPage extends StatelessWidget {
                 ),
                 child: const Center(
                   child: Text(
-                    "Continue",
+                    "Create Profile",
                     style: TextStyle(
                       fontSize: 18,
                       color: Colors.white,
@@ -441,9 +411,6 @@ class OnboardingPage extends StatelessWidget {
     );
   }
 
-  // ----------------------------------------------------------------------
-  // Testimonial Card
-  // ----------------------------------------------------------------------
   Widget _testimonialCard({
     required String quote,
     required String name,
@@ -479,9 +446,6 @@ class OnboardingPage extends StatelessWidget {
     );
   }
 
-  // ----------------------------------------------------------------------
-  // Step Tile (Work Details / Documents)
-  // ----------------------------------------------------------------------
   Widget _stepTile({
     required String step,
     required String title,
@@ -522,7 +486,6 @@ class OnboardingPage extends StatelessWidget {
 
             const SizedBox(width: 14),
 
-            // Title + Subtitle
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [

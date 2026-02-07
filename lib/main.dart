@@ -7,11 +7,13 @@ import 'package:riderrushbasketapp/app/module/auth/onboarding/binding/onboarding
 import 'package:riderrushbasketapp/app/module/auth/splash/binding/splash_binding.dart';
 
 import 'app/module/auth/document/screen/document_page.dart';
+import 'app/module/auth/jobrider/rider_job_list_page.dart';
 import 'app/module/auth/login/binding/otp_binding.dart';
 import 'app/module/auth/onboarding/screen/onboarding_screen.dart';
 import 'app/module/auth/personal/personalinfo.dart';
 import 'app/module/auth/splash/screen/splash_screen.dart';
 import 'app/module/auth/success/screen/success_page.dart';
+import 'app/module/auth/websocket/incoming_product_screen.dart';
 import 'app/module/auth/workdetail/screen/workdetailpage.dart';
 import 'app/routes/app_routes.dart'; // <-- Make sure this file exists
 import 'app/module/auth/login/binding/login_binding.dart';
@@ -46,7 +48,7 @@ class MyApp extends StatelessWidget {
         GetPage(name: AppRoutes.otp, page: () =>  OtpPage(), binding: OtpBinding()),
         GetPage(
           name: AppRoutes.onboarding,
-          page: () => const OnboardingPage(),
+          page: () =>  OnboardingPage(),
           binding: OnboardingBindings(),
         ),
         GetPage(
@@ -69,6 +71,11 @@ class MyApp extends StatelessWidget {
           page: () => const SuccessPage(),
         ),
 
+        GetPage(
+          name: AppRoutes.riderJobList,
+          page: () =>  IncomingProductScreen(),
+          // page: () =>  RiderJobListPage(),
+        ),
       ],
     );
   }

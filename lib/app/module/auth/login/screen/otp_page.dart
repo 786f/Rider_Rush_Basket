@@ -17,7 +17,6 @@ class OtpPage extends GetView<OtpController> {
         clipBehavior: Clip.none,
         children: [
 
-          // 🌟 TOP LEFT BEAUTIFUL GLOW (same as login)
           Positioned(
             top: -120,
             left: -120,
@@ -38,7 +37,6 @@ class OtpPage extends GetView<OtpController> {
             ),
           ),
 
-          // 🌟 BOTTOM ORANGE WAVE (same as login)
           Positioned(
             bottom: -160,
             right: -160,
@@ -59,7 +57,6 @@ class OtpPage extends GetView<OtpController> {
             ),
           ),
 
-          // 🌟 Subtle middle glow
           Positioned(
             bottom: 200,
             left: -80,
@@ -78,7 +75,6 @@ class OtpPage extends GetView<OtpController> {
             ),
           ),
 
-          // MAIN CONTENT
           SafeArea(
             child: SingleChildScrollView(
               child: Padding(
@@ -88,7 +84,6 @@ class OtpPage extends GetView<OtpController> {
 
                     const SizedBox(height: 70),
 
-                    // LOGO (matches login screen)
                     Center(
                       child: Hero(
                         tag: "app_logo",
@@ -101,7 +96,6 @@ class OtpPage extends GetView<OtpController> {
 
                     const SizedBox(height: 40),
 
-                    // TITLE
                     Text(
                       "Verify OTP 🔐",
                       style: TextStyle(
@@ -124,7 +118,6 @@ class OtpPage extends GetView<OtpController> {
 
                     const SizedBox(height: 45),
 
-                    // OTP BOXES (clean + premium)
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: List.generate(4, (index) {
@@ -167,7 +160,6 @@ class OtpPage extends GetView<OtpController> {
 
                     const SizedBox(height: 45),
 
-                    // VERIFY BUTTON (same style as login)
                     GestureDetector(
                       onTap: controller.verifyOtp,
                       child: Container(

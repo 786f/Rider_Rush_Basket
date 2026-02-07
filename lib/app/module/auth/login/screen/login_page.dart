@@ -14,7 +14,6 @@ class LoginPage extends GetView<LoginController> {
       body: Stack(
         children: [
 
-          // 🌟 TOP LEFT BEAUTIFUL GLOW
           Positioned(
             top: -120,
             left: -120,
@@ -39,7 +38,6 @@ class LoginPage extends GetView<LoginController> {
             ),
           ),
 
-          // 🌟 BIG BEAUTIFUL BOTTOM WAVE (FIXED)
           Positioned(
             bottom: -160,
             right: -160,
@@ -64,7 +62,6 @@ class LoginPage extends GetView<LoginController> {
             ),
           ),
 
-          // 🌟 MIDDLE SUBTLE GRADIENT (PREMIUM EFFECT)
           Positioned(
             bottom: 200,
             left: -80,
@@ -83,7 +80,6 @@ class LoginPage extends GetView<LoginController> {
             ),
           ),
 
-          // MAIN CONTENT
           SafeArea(
             child: SingleChildScrollView(
               child: Padding(
@@ -92,7 +88,6 @@ class LoginPage extends GetView<LoginController> {
                   children: [
                     const SizedBox(height: 70),
 
-                    // 🌟 LOGO
                     Center(
                       child: Hero(
                         tag: "app_logo",
@@ -104,8 +99,6 @@ class LoginPage extends GetView<LoginController> {
                     ),
 
                     const SizedBox(height: 40),
-
-                    // 🌟 TEXT TITLE
                     Text(
                       "Welcome Back 👋",
                       style: TextStyle(
@@ -126,8 +119,6 @@ class LoginPage extends GetView<LoginController> {
                     ),
 
                     const SizedBox(height: 45),
-
-                    // 🌟 GLASS INPUT BOX (PREMIUM CARD)
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                       decoration: BoxDecoration(
@@ -164,7 +155,6 @@ class LoginPage extends GetView<LoginController> {
 
                     const SizedBox(height: 45),
 
-                    // 🌟 PREMIUM GRADIENT BUTTON
                     GestureDetector(
                       onTap: controller.sendOtp,
                       child: Obx(() => Container(
