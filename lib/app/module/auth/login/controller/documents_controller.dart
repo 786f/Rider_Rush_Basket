@@ -25,7 +25,7 @@ class DocumentsController extends GetxController {
 
       var request = http.MultipartRequest(
         "PUT",
-        Uri.parse("http://46.202.164.93/api/rider/profile"),
+        Uri.parse("https://api.rushbaskets.com/api/rider/profile"),
       );
 
       request.headers["Authorization"] = "Bearer $token";

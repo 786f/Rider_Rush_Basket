@@ -13,7 +13,7 @@ class RiderJobController extends GetxController {
   RxList<RiderJobModel> jobList = <RiderJobModel>[].obs;
 
   final String baseUrl =
-      "http://46.202.164.93/api/rider-job-post";
+      "https://api.rushbaskets.com/api/rider-job-post";
 
   @override
   void onInit() {
@@ -36,7 +36,7 @@ class RiderJobController extends GetxController {
       }
 
       final Uri url =
-      Uri.parse("$baseUrl?city=bhopal");
+      Uri.parse("$baseUrl?city=siwan");
 
       final response = await http.get(
         url,
@@ -49,6 +49,7 @@ class RiderJobController extends GetxController {
       if (response.statusCode == 200) {
         final body = json.decode(response.body);
         final List data = body['data'];
+        print(body);
 
         jobList.value =
             data.map((e) => RiderJobModel.fromJson(e)).toList();

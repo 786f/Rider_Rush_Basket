@@ -5,7 +5,7 @@
 
 
     <application
-        android:label="riderrushbasketapp"
+        android:label="Rush Basket Rider"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

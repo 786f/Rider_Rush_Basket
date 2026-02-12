@@ -41,7 +41,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class AuthService {
-  static const String baseUrl = "http://46.202.164.93/api";
+  static const String baseUrl = "https://api.rushbaskets.com/api";
 
   static Future<Map<String, dynamic>> sendOtp(String mobile) async {
     final url = Uri.parse("$baseUrl/rider/login");

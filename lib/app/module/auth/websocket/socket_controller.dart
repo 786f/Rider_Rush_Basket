@@ -1,7 +1,11 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
+
+import '../network/api_endpoints.dart';
+import '../network/dio_client.dart';
 
 class SocketController extends GetxController {
   late IO.Socket socket;
@@ -13,7 +17,7 @@ class SocketController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    connectSocket(); // ✅ correct place
+    connectSocket();
   }
 
   Future<void> connectSocket() async {
@@ -21,7 +25,7 @@ class SocketController extends GetxController {
     final String? token = prefs.getString('auth_token');
 
     if (token == null || token.isEmpty) {
-      print("❌ TOKEN NOT FOUND");
+      print("TOKEN NOT FOUND");
       return;
     }
 
@@ -60,22 +64,6 @@ class SocketController extends GetxController {
     });
 
 
-    // socket.on('order_assignment_request', (data) {
-    //   print("📦 RAW SOCKET DATA RECEIVED:");
-    //   print(data);
-    //
-    //   if (data is Map) {
-    //     productData.value = Map<String, dynamic>.from(data);
-    //   } else {
-    //     print("⚠️ Unexpected data format: ${data.runtimeType}");
-    //     return;
-    //   }
-    //
-    //   showProductCard.value = true;
-    //
-    //   print("✅ PARSED PRODUCT DATA:");
-    //   print(productData);
-    // });
 
 
     socket.on('order_assignment_request', (data) {
@@ -105,6 +93,65 @@ class SocketController extends GetxController {
       }
     });
   }
+
+  RxBool isAcceptingOrder = false.obs;
+  Future<void> acceptOrder() async {
+    try {
+      isAcceptingOrder.value = true;
+
+      final orderId = productData['data']['_id'];
+
+      final response = await DioClient.instance.post(
+        "${ApiEndpoints.acceptOrder}/$orderId/accept",
+      );
+
+      debugPrint("✅ ORDER ACCEPTED: ${response.data}");
+
+      Get.snackbar(
+        "Order Accepted",
+        "You have successfully accepted the order",
+        snackPosition: SnackPosition.BOTTOM,
+      );
+
+      showProductCard.value = false;
+      productData.clear();
+
+    } on DioException catch (e) {
+      debugPrint("❌ ACCEPT ORDER FAILED: ${e.response?.data}");
+    } finally {
+      isAcceptingOrder.value = false;
+    }
+  }
+
+  Future<void> rejectOrder() async {
+    try {
+      isAcceptingOrder.value = true;
+
+      final orderId = productData['data']['_id'];
+      print("ORDER ID $orderId");
+
+      final response = await DioClient.instance.post(
+        "${ApiEndpoints.rejectOrder}/$orderId/reject",
+      );
+
+      debugPrint("❌ ORDER REJECTED: ${response.data}");
+
+      Get.snackbar(
+        "Order Rejected",
+        "You have rejected the order",
+        snackPosition: SnackPosition.BOTTOM,
+      );
+
+      showProductCard.value = false;
+      productData.clear();
+
+    } on DioException catch (e) {
+      debugPrint("❌ REJECT ORDER FAILED: ${e.response?.data}");
+    } finally {
+      isAcceptingOrder.value = false;
+    }
+  }
+
 
   void clearProduct() {
     productData.clear();

@@ -10,6 +10,7 @@ class AppRoutes {
   static const String success = '/success';
   static const String personal = '/personal';
   static const riderJobList = '/rider-job-list';
+  static const nav = '/nav';
 
 
 }

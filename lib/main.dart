@@ -9,6 +9,7 @@ import 'package:riderrushbasketapp/app/module/auth/splash/binding/splash_binding
 import 'app/module/auth/document/screen/document_page.dart';
 import 'app/module/auth/jobrider/rider_job_list_page.dart';
 import 'app/module/auth/login/binding/otp_binding.dart';
+import 'app/module/auth/nav/bottom_nav_screen.dart';
 import 'app/module/auth/onboarding/screen/onboarding_screen.dart';
 import 'app/module/auth/personal/personalinfo.dart';
 import 'app/module/auth/splash/screen/splash_screen.dart';
@@ -73,8 +74,11 @@ class MyApp extends StatelessWidget {
 
         GetPage(
           name: AppRoutes.riderJobList,
-          page: () =>  IncomingProductScreen(),
-          // page: () =>  RiderJobListPage(),
+          page: () =>  RiderJobListPage(),
+        ),
+        GetPage(
+          name: AppRoutes.nav,
+          page: () =>  BottomNavScreen(),
         ),
       ],
     );

@@ -9,7 +9,7 @@ class DioClient {
     if (_dio == null) {
       _dio = Dio(
         BaseOptions(
-          baseUrl: "http://46.202.164.93/api",
+          baseUrl: "https://api.rushbaskets.com/api",
           connectTimeout: const Duration(seconds: 15),
           receiveTimeout: const Duration(seconds: 15),
           headers: {
@@ -28,6 +28,7 @@ class DioClient {
 
             if (token != null) {
               options.headers["Authorization"] =
+              // "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5NmZhNjNkZTU1YzFmY2IyYTA1NzY1YiIsInJvbGUiOiJyaWRlciIsImlhdCI6MTc3MDQ1MDgwMSwiZXhwIjoxNzcxMDU1NjAxfQ.FUTHJr4dxnjnjdfbH5oNIZ9H04bfw2NvZiD6I2EqgqU";
               "Bearer $token";
             }
 
