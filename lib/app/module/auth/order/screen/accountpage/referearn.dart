@@ -153,10 +153,10 @@ class ReferEarnPage extends StatelessWidget {
                 onPressed: () {
                  // Share.share("Use my RushBasket code *RB4521* to get rewards!");
                 },
-                icon: const Icon(Icons.share),
+                icon: const Icon(Icons.share,color: Colors.white,),
                 label: const Text(
                   "Share Referral Code",
-                  style: TextStyle(fontSize: 16),
+                  style: TextStyle(fontSize: 16,color: Colors.white),
                 ),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: primary,

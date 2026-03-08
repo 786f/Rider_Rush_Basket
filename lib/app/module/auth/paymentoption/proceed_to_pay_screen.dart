@@ -26,7 +26,6 @@ class _ProceedToPayScreenState extends State<ProceedToPayScreen> {
   final MarkPaymentController paymentController =
   Get.put(MarkPaymentController());
 
-  // If you already have AuthController
 
   @override
   Widget build(BuildContext context) {
@@ -128,21 +127,23 @@ class _ProceedToPayScreenState extends State<ProceedToPayScreen> {
               child: Obx(() => ElevatedButton(
                 onPressed: paymentController.isLoading.value
                     ? null
-                    : () {
+                    : () async {
                   if (selectedMethod == "online") {
-                    Get.snackbar(
-                      "Coming Soon",
-                      "Online payment feature is coming soon",
-                      backgroundColor: Colors.orange,
-                      colorText: Colors.white,
-                    );
-                  } else {
-                    final String token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5OGIwMTFkMWI0OWU4OGE5MmI3ZWYxOSIsInJvbGUiOiJyaWRlciIsImlhdCI6MTc3MDcxODAwNiwiZXhwIjoxNzcxMzIyODA2fQ.RQEEziapQBnVtT3LS-3m5slXm1f254YmrurhZJvgaSw";
+                    // Get.snackbar(
+                    //   "Coming Soon",
+                    //   "Online payment feature is coming soon",
+                    //   backgroundColor: Colors.orange,
+                    //   colorText: Colors.white,
+                    // );
 
+                    paymentController.createOnlinePayment(
+                      orderId: widget.orderId,
+                    );
+
+                  } else {
 
                     paymentController.markCashPayment(
                       orderId: widget.orderId,
-                      token: token,
                     );
                   }
                 },

@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../personal/personal_info_controller.dart';
 import 'document_upload_status.dart';
 
 class BankDetailPage extends StatefulWidget {
@@ -38,6 +39,7 @@ class _BankDetailPageState extends State<BankDetailPage> {
   }
 
   Future<void> saveBankDetails() async {
+
     final prefs = await SharedPreferences.getInstance();
 
     String accountNumber = accountController.text.replaceAll(' ', '');
@@ -50,6 +52,9 @@ class _BankDetailPageState extends State<BankDetailPage> {
     UploadStatus.bankUploaded = true;
     await UploadStatus.saveStatus();
 
+    final controller = Get.find<PersonalInfoController>();
+    controller.bankUploaded.value = true;
+
     Get.snackbar(
       "Success",
       "Bank details saved successfully!",
@@ -57,12 +62,12 @@ class _BankDetailPageState extends State<BankDetailPage> {
       colorText: Colors.black,
     );
 
-    Navigator.pop(context, true); // 🔥 return true to refresh parent
+    Navigator.pop(context, true);
   }
 
 
   void skipBankDetails() {
-    Navigator.pop(context); // Simply go back to previous page
+    Navigator.pop(context);
   }
 
   @override

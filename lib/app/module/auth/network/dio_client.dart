@@ -28,7 +28,6 @@ class DioClient {
 
             if (token != null) {
               options.headers["Authorization"] =
-              // "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5NmZhNjNkZTU1YzFmY2IyYTA1NzY1YiIsInJvbGUiOiJyaWRlciIsImlhdCI6MTc3MDQ1MDgwMSwiZXhwIjoxNzcxMDU1NjAxfQ.FUTHJr4dxnjnjdfbH5oNIZ9H04bfw2NvZiD6I2EqgqU";
               "Bearer $token";
             }
 
@@ -45,6 +44,19 @@ class DioClient {
           },
           onError: (DioException e, handler) {
             print("❌ Error: ${e.message}");
+
+            print("=========== API ERROR ===========");
+
+            print("URL: ${e.requestOptions.uri}");
+
+            print("STATUS: ${e.response?.statusCode}");
+
+            print("ERROR DATA: ${e.response?.data}");
+
+            print("MESSAGE: ${e.message}");
+
+            print("=================================");
+
 
             Get.snackbar(
               "Error",

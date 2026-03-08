@@ -5,6 +5,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../routes/app_routes.dart';
+import '../../personal/personal_info_controller.dart';
 import 'document_upload_status.dart';
 
 class AadhaarUploadPage extends StatefulWidget {
@@ -31,7 +32,7 @@ class _AadhaarUploadPageState extends State<AadhaarUploadPage> {
     }
   }
 
-  /// Load saved data
+
   void loadExistingAadhaar() async {
     final prefs = await SharedPreferences.getInstance();
 
@@ -45,7 +46,7 @@ class _AadhaarUploadPageState extends State<AadhaarUploadPage> {
     setState(() {});
   }
 
-  /// Show bottom sheet camera / gallery
+
   void showImagePicker(Function(XFile?) onImagePicked) {
     showModalBottomSheet(
       context: context,
@@ -130,8 +131,13 @@ class _AadhaarUploadPageState extends State<AadhaarUploadPage> {
     });
   }
 
-  /// Save all Aadhaar details locally
   Future<void> saveAadhaarDetails() async {
+
+    if(frontImage == null || backImage == null){
+      Get.snackbar("Error", "Please upload both Aadhaar images");
+      return;
+    }
+
     final prefs = await SharedPreferences.getInstance();
 
     await prefs.setString("aadhaarFront", frontImage!.path);
@@ -140,6 +146,9 @@ class _AadhaarUploadPageState extends State<AadhaarUploadPage> {
 
     UploadStatus.aadhaarUploaded = true;
     await UploadStatus.saveStatus();
+
+    final controller = Get.find<PersonalInfoController>();
+    controller.aadhaarUploaded.value = true;
 
     Get.snackbar(
       "Success",

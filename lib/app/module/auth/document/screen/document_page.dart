@@ -109,8 +109,6 @@ class DocumentTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final PersonalInfoController controller = Get.find<PersonalInfoController>();
-
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: ClipRRect(
@@ -124,27 +122,40 @@ class DocumentTile extends StatelessWidget {
             ),
             child: InkWell(
               onTap: () {
+
                 if (title == "Profile Picture (Selfie)") {
-                  controller.profileUploaded.value = true;
                   Get.to(() => const ProfileUploadPage(isEditing: false));
-                } else if (title == "Aadhar Card") {
-                  controller.aadhaarUploaded.value = true;
+                }
+
+                else if (title == "Aadhar Card") {
                   Get.to(() => const AadhaarUploadPage(isEditing: false));
-                } else if (title == "PAN Card") {
-                  controller.panUploaded.value = true;
+                }
+
+                else if (title == "PAN Card") {
                   Get.to(() => const PanUploadPage(isEditing: false));
-                } else if (title == "Driving License") {
-                  controller.licenseUploaded.value = true;
+                }
+
+                else if (title == "Driving License") {
                   Get.to(() => const DrivingLicenseUploadPage(isEditing: false));
-                } else if (title == "Bank Details") {
-                  controller.bankUploaded.value = true;
+                }
+
+                else if (title == "Bank Details") {
                   Get.to(() => const BankDetailPage(isEditing: false));
                 }
+
               },
               child: ListTile(
-                leading: CircleAvatar(backgroundColor: Colors.white, child: Image.asset(icon)),
-                title: Text(title, style: const TextStyle(fontWeight: FontWeight.w600, color: Color(0xFFF28C28))),
-                trailing: const Icon(Icons.arrow_forward_ios, color: Color(0xFFF28C28)),
+                leading: CircleAvatar(
+                    backgroundColor: Colors.white,
+                    child: Image.asset(icon)),
+                title: Text(
+                  title,
+                  style: const TextStyle(
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFFF28C28)),
+                ),
+                trailing: const Icon(Icons.arrow_forward_ios,
+                    color: Color(0xFFF28C28)),
               ),
             ),
           ),

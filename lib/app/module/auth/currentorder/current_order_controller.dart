@@ -1,21 +1,20 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import '../paymentoption/proceed_to_pay_screen.dart';
 import 'current_order_model.dart';
 
 class CurrentOrderController extends GetxController {
+
   var isLoading = true.obs;
   var orderData = Rxn<OrderData>();
   var selectedImage = Rxn<File>();
 
   final String apiUrl = "https://api.rushbaskets.com/api/rider/orders/current";
 
-  final String token =
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5OGIwMTFkMWI0OWU4OGE5MmI3ZWYxOSIsInJvbGUiOiJyaWRlciIsImlhdCI6MTc3MDcxODAwNiwiZXhwIjoxNzcxMzIyODA2fQ.RQEEziapQBnVtT3LS-3m5slXm1f254YmrurhZJvgaSw";
 
   @override
   void onInit() {
@@ -25,6 +24,9 @@ class CurrentOrderController extends GetxController {
 
   Future<void> fetchCurrentOrder() async {
     try {
+      SharedPreferences prefs =
+      await SharedPreferences.getInstance();
+      String? token = prefs.getString("auth_token");
       isLoading(true);
       final response = await http.get(
         Uri.parse(apiUrl),
@@ -48,11 +50,12 @@ class CurrentOrderController extends GetxController {
     }
   }
 
-
-
   Future<void> uploadDeliveryImage(String orderId) async {
     print(orderId);
     try {
+      SharedPreferences prefs =
+      await SharedPreferences.getInstance();
+      String? token = prefs.getString("auth_token");
       isLoading(true);
 
       var request = http.MultipartRequest(
@@ -109,7 +112,9 @@ class CurrentOrderController extends GetxController {
   Future<void> uploadDeliveredImage(String orderId) async {
     try {
       isLoading(true);
-
+      SharedPreferences prefs =
+      await SharedPreferences.getInstance();
+      String? token = prefs.getString("auth_token");
       var request = http.MultipartRequest(
         "POST",
         Uri.parse(

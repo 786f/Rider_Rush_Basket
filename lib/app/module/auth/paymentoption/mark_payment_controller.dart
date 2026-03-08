@@ -2,15 +2,21 @@ import 'dart:convert';
 import 'dart:ui';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
+import 'package:riderrushbasketapp/app/module/auth/paymentoption/payment_webview_page.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class MarkPaymentController extends GetxController {
   var isLoading = false.obs;
 
   Future<void> markCashPayment({
     required String orderId,
-    required String token,
+
   }) async {
     try {
+      SharedPreferences prefs =
+      await SharedPreferences.getInstance();
+
+      String? token = prefs.getString("auth_token");
       isLoading.value = true;
 
       final url = Uri.parse(
@@ -34,7 +40,7 @@ class MarkPaymentController extends GetxController {
           colorText: const Color(0xffffffff),
         );
 
-        Get.back(); // go back after success
+        Get.back();
       } else {
         final data = jsonDecode(response.body);
         Get.snackbar(
@@ -55,4 +61,55 @@ class MarkPaymentController extends GetxController {
       isLoading.value = false;
     }
   }
+
+
+  Future<void> createOnlinePayment(  {required String orderId}) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString("auth_token");
+
+      final paymentResponse = await http.post(
+        Uri.parse("https://api.rushbaskets.com/api/payment/create-payment-link"),
+        headers: {
+          "Content-Type": "application/json",
+          if (token != null) "Authorization": "Bearer $token",
+        },
+        body: jsonEncode({
+          "amount": "50",
+          "name": "Customer Name",
+          "email": "customer@email.com",
+          "contact": "9334917021",
+          "description": "RushBaskets Order Payment",
+          "callbackUrl": "https://grocery.rushbaskets.com/payment-success"
+        }),
+      );
+
+      final paymentDecoded = jsonDecode(paymentResponse.body);
+
+      print("Final Payment$paymentDecoded");
+
+      if (paymentResponse.statusCode == 200 &&
+          paymentDecoded['success'] == true) {
+
+        final paymentUrl = paymentDecoded['payment_url'];
+
+        if (paymentUrl != null) {
+          Get.to(
+                () => PaymentWebViewPage(
+              paymentUrl: paymentUrl,
+              orderId: orderId,
+            ),
+          );
+        }
+      } else {
+        Get.snackbar(
+            "Payment Error",
+            paymentDecoded['message'] ?? "Failed");
+      }
+    } catch (e) {
+      Get.snackbar("Error", e.toString());
+    }
+  }
+
+
 }

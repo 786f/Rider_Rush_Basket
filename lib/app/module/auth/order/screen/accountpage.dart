@@ -297,27 +297,6 @@ class AccountPage extends StatelessWidget {
     );
   }
 
-  /// BOTTOM NAV ITEM
-  Widget _bottomNavItem(
-      IconData icon, String label, bool active, VoidCallback onTap) {
-    final Color primary = const Color(0xFFF28C28);
-    return GestureDetector(
-      onTap: onTap,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 26, color: active ? primary : Colors.black45),
-          const SizedBox(height: 4),
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 14,
-              color: active ? primary : Colors.black54,
-              fontWeight: active ? FontWeight.bold : FontWeight.w500,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+
+
 }

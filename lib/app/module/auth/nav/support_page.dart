@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:url_launcher/url_launcher.dart';
-import '../../../nav/support_controller.dart';
-
+import 'support_controller.dart';
 
 class SupportPage extends StatelessWidget {
 
@@ -253,21 +252,21 @@ class SupportPage extends StatelessWidget {
                 onTap: () => _launchURL("tel:9999988888"),
               ),
 
-              // _supportTile(
-              //   icon: Icons.email_outlined,
-              //   title: "Email Support",
-              //   subtitle: "support@rushbasket.com",
-              //   iconColor: Colors.blue,
-              //   onTap: () => _launchURL("mailto:support@rushbasket.com"),
-              // ),
+              _supportTile(
+                icon: Icons.email_outlined,
+                title: "Email Support",
+                subtitle: "support@rushbasket.com",
+                iconColor: Colors.blue,
+                onTap: () => _launchURL("mailto:support@rushbasket.com"),
+              ),
 
-              // _supportTile(
-              //   icon: Icons.message_rounded,
-              //   title: "WhatsApp Chat",
-              //   subtitle: "Message us anytime",
-              //   iconColor: Colors.teal,
-              //   onTap: () => _launchURL("https://wa.me/9999988888"),
-              // ),
+              _supportTile(
+                icon: Icons.message_rounded,
+                title: "WhatsApp Chat",
+                subtitle: "Message us anytime",
+                iconColor: Colors.teal,
+                onTap: () => _launchURL("https://wa.me/9999988888"),
+              ),
 
               const SizedBox(height: 20),
 

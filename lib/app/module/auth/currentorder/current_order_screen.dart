@@ -271,267 +271,520 @@ class CurrentOrderScreen extends StatelessWidget {
         ),
       ),
       body: Obx(() {
-        if (controller.isLoading.value) {
-          return const Center(child: CircularProgressIndicator());
-        }
-
         final order = controller.orderData.value;
 
-        if (order == null) {
-          return const Center(
-            child: Text(
-              "No current order available",
-              style: TextStyle(fontSize: 16),
-            ),
-          );
-        }
-
-        return Column(
-          children: [
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  children: [
-                    _card(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            mainAxisAlignment:
-                            MainAxisAlignment.spaceBetween,
-                            children: [
-                              _title("Order #${order.orderNumber}"),
-                              _statusChip(order.status),
-                            ],
-                          ),
-                          const SizedBox(height: 12),
-                          _row("Payment", order.paymentMethod),
-                          _row("Total Amount", "₹${order.total}"),
-                          _row("Your Earnings", "₹${order.deliveryAmount}"),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    _card(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          _sectionTitle("Customer Details"),
-                          const SizedBox(height: 12),
-                          InkWell(
-                            borderRadius: BorderRadius.circular(16),
-                            onTap: () => _callCustomer(order.userPhone),
-                            child: Container(
-                              padding: const EdgeInsets.all(14),
-                              decoration: BoxDecoration(
-                                color: primaryOrange.withOpacity(0.08),
-                                borderRadius: BorderRadius.circular(16),
-                              ),
-                              child: Row(
-                                children: [
-                                  const CircleAvatar(
-                                    backgroundColor: primaryOrange,
-                                    child: Icon(Icons.call,
-                                        color: Colors.white),
-                                  ),
-                                  const SizedBox(width: 12),
-                                  Expanded(
-                                    child: Text(
-                                      order.userPhone,
-                                      style: const TextStyle(
-                                          fontWeight: FontWeight.w600),
-                                    ),
-                                  ),
-                                  const Icon(Icons.arrow_forward_ios,
-                                      size: 16)
-                                ],
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 12),
-                          Row(
-                            crossAxisAlignment:
-                            CrossAxisAlignment.start,
-                            children: [
-                              const Icon(Icons.location_on,
-                                  color: primaryOrange),
-                              const SizedBox(width: 8),
-                              Expanded(
-                                child: Text(
-                                  "${order.shippingAddress.line1}, ${order.shippingAddress.city}, ${order.shippingAddress.state} - ${order.shippingAddress.pinCode}",
-                                  style:
-                                  const TextStyle(height: 1.4),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    _card(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          _sectionTitle("Order Items"),
-                          const SizedBox(height: 12),
-                          ...order.items.map((item) {
-                            return Container(
-                              margin:
-                              const EdgeInsets.only(bottom: 12),
-                              padding:
-                              const EdgeInsets.all(12),
-                              decoration: BoxDecoration(
-                                color: Colors.grey.shade50,
-                                borderRadius:
-                                BorderRadius.circular(14),
-                              ),
-                              child: Row(
-                                children: [
-                                  ClipRRect(
-                                    borderRadius:
-                                    BorderRadius.circular(12),
-                                    child: Image.network(
-                                      item.image,
-                                      width: 60,
-                                      height: 60,
-                                      fit: BoxFit.cover,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 12),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                      CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          item.productName,
-                                          style: const TextStyle(
-                                              fontWeight:
-                                              FontWeight.w600),
-                                        ),
-                                        const SizedBox(height: 4),
-                                        Text(
-                                          "Qty: ${item.quantity}",
-                                          style: const TextStyle(
-                                              color:
-                                              Colors.black54),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  Text(
-                                    "₹${item.price}",
-                                    style: const TextStyle(
-                                      fontWeight:
-                                      FontWeight.bold,
-                                      color: primaryOrange,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            );
-                          }).toList(),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                  ],
+        return RefreshIndicator(
+          color: primaryOrange,
+          onRefresh: () async {
+            await controller.fetchCurrentOrder();
+          },
+          child: controller.isLoading.value
+              ? const Center(child: CircularProgressIndicator())
+              : order == null
+              ? ListView(
+            children: const [
+              SizedBox(height: 300),
+              Center(
+                child: Text(
+                  "No current order available",
+                  style: TextStyle(fontSize: 16),
                 ),
               ),
-            ),
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                boxShadow: [
-                  BoxShadow(
-                    blurRadius: 10,
-                    color: Colors.black12,
-                    offset: Offset(0, -2),
-                  )
-                ],
+            ],
+          )
+              : Column(
+            children: [
+              Expanded(
+                child: SingleChildScrollView(
+                  physics:
+                  const AlwaysScrollableScrollPhysics(),
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    children: [
+                      _card(
+                        child: Column(
+                          crossAxisAlignment:
+                          CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              mainAxisAlignment:
+                              MainAxisAlignment
+                                  .spaceBetween,
+                              children: [
+                                _title(
+                                    "Order #${order.orderNumber}"),
+                                _statusChip(order.status),
+                              ],
+                            ),
+                            const SizedBox(height: 12),
+                            _row("Payment",
+                                order.paymentMethod),
+                            _row("Total Amount",
+                                "₹${order.total}"),
+                            _row("Your Earnings",
+                                "₹${order.deliveryAmount}"),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+
+                      // CUSTOMER CARD
+                      _card(
+                        child: Column(
+                          crossAxisAlignment:
+                          CrossAxisAlignment.start,
+                          children: [
+                            _sectionTitle(
+                                "Customer Details"),
+                            const SizedBox(height: 12),
+                            InkWell(
+                              borderRadius:
+                              BorderRadius.circular(
+                                  16),
+                              onTap: () =>
+                                  _callCustomer(
+                                      order.userPhone),
+                              child: Container(
+                                padding:
+                                const EdgeInsets.all(
+                                    14),
+                                decoration: BoxDecoration(
+                                  color: primaryOrange
+                                      .withOpacity(0.08),
+                                  borderRadius:
+                                  BorderRadius
+                                      .circular(
+                                      16),
+                                ),
+                                child: Row(
+                                  children: [
+                                    const CircleAvatar(
+                                      backgroundColor:
+                                      primaryOrange,
+                                      child: Icon(
+                                          Icons.call,
+                                          color: Colors
+                                              .white),
+                                    ),
+                                    const SizedBox(
+                                        width: 12),
+                                    Expanded(
+                                      child: Text(
+                                        order.userPhone,
+                                        style: const TextStyle(
+                                            fontWeight:
+                                            FontWeight
+                                                .w600),
+                                      ),
+                                    ),
+                                    const Icon(
+                                        Icons
+                                            .arrow_forward_ios,
+                                        size: 16)
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      const SizedBox(height: 20),
+                    ],
+                  ),
+                ),
               ),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: OutlinedButton.icon(
-                      onPressed: () {
-                        if (order.status == "rider_assign") {
-                          _openGoogleMap(
-                            order.vendor.storeAddress.latitude,
-                            order.vendor.storeAddress.longitude,
-                          );
-                        } else {
-                          _openGoogleMap(
-                            order.shippingAddress.latitude,
-                            order.shippingAddress.longitude,
-                          );
-                        }
-                      },
-                      icon: const Icon(Icons.navigation),
-                      label: const Text("Navigate"),
-                      style: OutlinedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        side: const BorderSide(
-                            color: primaryOrange),
-                        foregroundColor: primaryOrange,
-                        shape: RoundedRectangleBorder(
-                          borderRadius:
-                          BorderRadius.circular(30),
+
+              // BOTTOM BUTTONS
+              Container(
+                padding:
+                const EdgeInsets.all(16),
+                decoration:
+                const BoxDecoration(
+                  color: Colors.white,
+                  boxShadow: [
+                    BoxShadow(
+                      blurRadius: 10,
+                      color: Colors.black12,
+                      offset: Offset(0, -2),
+                    )
+                  ],
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child:
+                      OutlinedButton.icon(
+                        onPressed: () {
+                          if (order.status ==
+                              "rider_assign") {
+                            _openGoogleMap(
+                              order.vendor
+                                  .storeAddress
+                                  .latitude,
+                              order.vendor
+                                  .storeAddress
+                                  .longitude,
+                            );
+                          } else {
+                            _openGoogleMap(
+                              order
+                                  .shippingAddress
+                                  .latitude,
+                              order
+                                  .shippingAddress
+                                  .longitude,
+                            );
+                          }
+                        },
+                        icon: const Icon(
+                            Icons.navigation),
+                        label:
+                        const Text("Navigate"),
+                        style:
+                        OutlinedButton
+                            .styleFrom(
+                          padding:
+                          const EdgeInsets
+                              .symmetric(
+                              vertical: 16),
+                          side: const BorderSide(
+                              color:
+                              primaryOrange),
+                          foregroundColor:
+                          primaryOrange,
+                          shape:
+                          RoundedRectangleBorder(
+                            borderRadius:
+                            BorderRadius
+                                .circular(
+                                30),
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: ElevatedButton.icon(
-                      onPressed: () {
-                        if (order.status == "rider_assign") {
-                          _openCameraBottomSheet(context, order.id);
-                        } else if (order.status == "out_for_delivery") {
-                          _openDeliveredBottomSheet(context, order.id);
-                        }
-                      },
-                      // onPressed: () {
-                      //   if (order.status ==
-                      //       "rider_assign") {
-                      //     _openCameraBottomSheet(context, order.id);
-                      //   } else {
-                      //     _showDeliveredDialog(
-                      //         context, order.id);
-                      //   }
-                      // },
-                      icon:
-                      const Icon(Icons.check_circle,color: Colors.white,),
-                      label: Text(
-                        order.status == "rider_assign"
-                            ? "Pick-Up"
-                            : order.status == "out_for_delivery"
-                            ? "Delivered"
-                            : "Completed",
-                        style: const TextStyle(color: Colors.white),
-                      ),
-                      // label: Text(order.status == "rider_assign" ? "Pick-Up" : "Delivered",style: TextStyle(color: Colors.white),),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: primaryOrange,
-                        padding:
-                        const EdgeInsets.symmetric(
-                            vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius:
-                          BorderRadius.circular(30),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child:
+                      ElevatedButton.icon(
+                        onPressed: () {
+                          if (order.status ==
+                              "rider_assign") {
+                            _openCameraBottomSheet(
+                                context,
+                                order.id);
+                          } else if (order
+                              .status ==
+                              "out_for_delivery") {
+                            _openDeliveredBottomSheet(
+                                context,
+                                order.id);
+                          }
+                        },
+                        icon: const Icon(
+                            Icons.check_circle,
+                            color: Colors.white),
+                        label: Text(
+                          order.status ==
+                              "rider_assign"
+                              ? "Pick-Up"
+                              : order.status ==
+                              "out_for_delivery"
+                              ? "Delivered"
+                              : "Completed",
+                          style: const TextStyle(
+                              color:
+                              Colors.white),
+                        ),
+                        style:
+                        ElevatedButton
+                            .styleFrom(
+                          backgroundColor:
+                          primaryOrange,
+                          padding:
+                          const EdgeInsets
+                              .symmetric(
+                              vertical: 16),
+                          shape:
+                          RoundedRectangleBorder(
+                            borderRadius:
+                            BorderRadius
+                                .circular(
+                                30),
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                ],
-              ),
-            )
-          ],
+                  ],
+                ),
+              )
+            ],
+          ),
         );
       }),
+
+      // body: Obx(() {
+      //   if (controller.isLoading.value) {
+      //     return const Center(child: CircularProgressIndicator());
+      //   }
+      //
+      //   final order = controller.orderData.value;
+      //
+      //   if (order == null) {
+      //     return const Center(
+      //       child: Text(
+      //         "No current order available",
+      //         style: TextStyle(fontSize: 16),
+      //       ),
+      //     );
+      //   }
+      //
+      //   return Column(
+      //     children: [
+      //       Expanded(
+      //         child: SingleChildScrollView(
+      //           padding: const EdgeInsets.all(16),
+      //           child: Column(
+      //             children: [
+      //               _card(
+      //                 child: Column(
+      //                   crossAxisAlignment: CrossAxisAlignment.start,
+      //                   children: [
+      //                     Row(
+      //                       mainAxisAlignment:
+      //                       MainAxisAlignment.spaceBetween,
+      //                       children: [
+      //                         _title("Order #${order.orderNumber}"),
+      //                         _statusChip(order.status),
+      //                       ],
+      //                     ),
+      //                     const SizedBox(height: 12),
+      //                     _row("Payment", order.paymentMethod),
+      //                     _row("Total Amount", "₹${order.total}"),
+      //                     _row("Your Earnings", "₹${order.deliveryAmount}"),
+      //                   ],
+      //                 ),
+      //               ),
+      //               const SizedBox(height: 16),
+      //               _card(
+      //                 child: Column(
+      //                   crossAxisAlignment: CrossAxisAlignment.start,
+      //                   children: [
+      //                     _sectionTitle("Customer Details"),
+      //                     const SizedBox(height: 12),
+      //                     InkWell(
+      //                       borderRadius: BorderRadius.circular(16),
+      //                       onTap: () => _callCustomer(order.userPhone),
+      //                       child: Container(
+      //                         padding: const EdgeInsets.all(14),
+      //                         decoration: BoxDecoration(
+      //                           color: primaryOrange.withOpacity(0.08),
+      //                           borderRadius: BorderRadius.circular(16),
+      //                         ),
+      //                         child: Row(
+      //                           children: [
+      //                             const CircleAvatar(
+      //                               backgroundColor: primaryOrange,
+      //                               child: Icon(Icons.call,
+      //                                   color: Colors.white),
+      //                             ),
+      //                             const SizedBox(width: 12),
+      //                             Expanded(
+      //                               child: Text(
+      //                                 order.userPhone,
+      //                                 style: const TextStyle(
+      //                                     fontWeight: FontWeight.w600),
+      //                               ),
+      //                             ),
+      //                             const Icon(Icons.arrow_forward_ios,
+      //                                 size: 16)
+      //                           ],
+      //                         ),
+      //                       ),
+      //                     ),
+      //                     const SizedBox(height: 12),
+      //                     Row(
+      //                       crossAxisAlignment:
+      //                       CrossAxisAlignment.start,
+      //                       children: [
+      //                         const Icon(Icons.location_on,
+      //                             color: primaryOrange),
+      //                         const SizedBox(width: 8),
+      //                         Expanded(
+      //                           child: Text(
+      //                             "${order.shippingAddress.line1}, ${order.shippingAddress.city}, ${order.shippingAddress.state} - ${order.shippingAddress.pinCode}",
+      //                             style:
+      //                             const TextStyle(height: 1.4),
+      //                           ),
+      //                         ),
+      //                       ],
+      //                     ),
+      //                   ],
+      //                 ),
+      //               ),
+      //               const SizedBox(height: 16),
+      //               _card(
+      //                 child: Column(
+      //                   crossAxisAlignment: CrossAxisAlignment.start,
+      //                   children: [
+      //                     _sectionTitle("Order Items"),
+      //                     const SizedBox(height: 12),
+      //                     ...order.items.map((item) {
+      //                       return Container(
+      //                         margin:
+      //                         const EdgeInsets.only(bottom: 12),
+      //                         padding:
+      //                         const EdgeInsets.all(12),
+      //                         decoration: BoxDecoration(
+      //                           color: Colors.grey.shade50,
+      //                           borderRadius:
+      //                           BorderRadius.circular(14),
+      //                         ),
+      //                         child: Row(
+      //                           children: [
+      //                             ClipRRect(
+      //                               borderRadius:
+      //                               BorderRadius.circular(12),
+      //                               child: Image.network(
+      //                                 item.image,
+      //                                 width: 60,
+      //                                 height: 60,
+      //                                 fit: BoxFit.cover,
+      //                               ),
+      //                             ),
+      //                             const SizedBox(width: 12),
+      //                             Expanded(
+      //                               child: Column(
+      //                                 crossAxisAlignment:
+      //                                 CrossAxisAlignment.start,
+      //                                 children: [
+      //                                   Text(
+      //                                     item.productName,
+      //                                     style: const TextStyle(
+      //                                         fontWeight:
+      //                                         FontWeight.w600),
+      //                                   ),
+      //                                   const SizedBox(height: 4),
+      //                                   Text(
+      //                                     "Qty: ${item.quantity}",
+      //                                     style: const TextStyle(
+      //                                         color:
+      //                                         Colors.black54),
+      //                                   ),
+      //                                 ],
+      //                               ),
+      //                             ),
+      //                             Text(
+      //                               "₹${item.price}",
+      //                               style: const TextStyle(
+      //                                 fontWeight:
+      //                                 FontWeight.bold,
+      //                                 color: primaryOrange,
+      //                               ),
+      //                             ),
+      //                           ],
+      //                         ),
+      //                       );
+      //                     }).toList(),
+      //                   ],
+      //                 ),
+      //               ),
+      //               const SizedBox(height: 20),
+      //             ],
+      //           ),
+      //         ),
+      //       ),
+      //       Container(
+      //         padding: const EdgeInsets.all(16),
+      //         decoration: const BoxDecoration(
+      //           color: Colors.white,
+      //           boxShadow: [
+      //             BoxShadow(
+      //               blurRadius: 10,
+      //               color: Colors.black12,
+      //               offset: Offset(0, -2),
+      //             )
+      //           ],
+      //         ),
+      //         child: Row(
+      //           children: [
+      //             Expanded(
+      //               child: OutlinedButton.icon(
+      //                 onPressed: () {
+      //                   if (order.status == "rider_assign") {
+      //                     _openGoogleMap(
+      //                       order.vendor.storeAddress.latitude,
+      //                       order.vendor.storeAddress.longitude,
+      //                     );
+      //                   } else {
+      //                     _openGoogleMap(
+      //                       order.shippingAddress.latitude,
+      //                       order.shippingAddress.longitude,
+      //                     );
+      //                   }
+      //                 },
+      //                 icon: const Icon(Icons.navigation),
+      //                 label: const Text("Navigate"),
+      //                 style: OutlinedButton.styleFrom(
+      //                   padding: const EdgeInsets.symmetric(vertical: 16),
+      //                   side: const BorderSide(
+      //                       color: primaryOrange),
+      //                   foregroundColor: primaryOrange,
+      //                   shape: RoundedRectangleBorder(
+      //                     borderRadius:
+      //                     BorderRadius.circular(30),
+      //                   ),
+      //                 ),
+      //               ),
+      //             ),
+      //             const SizedBox(width: 12),
+      //             Expanded(
+      //               child: ElevatedButton.icon(
+      //                 onPressed: () {
+      //                   if (order.status == "rider_assign") {
+      //                     _openCameraBottomSheet(context, order.id);
+      //                   } else if (order.status == "out_for_delivery") {
+      //                     _openDeliveredBottomSheet(context, order.id);
+      //                   }
+      //                 },
+      //                 // onPressed: () {
+      //                 //   if (order.status ==
+      //                 //       "rider_assign") {
+      //                 //     _openCameraBottomSheet(context, order.id);
+      //                 //   } else {
+      //                 //     _showDeliveredDialog(
+      //                 //         context, order.id);
+      //                 //   }
+      //                 // },
+      //                 icon:
+      //                 const Icon(Icons.check_circle,color: Colors.white,),
+      //                 label: Text(
+      //                   order.status == "rider_assign"
+      //                       ? "Pick-Up"
+      //                       : order.status == "out_for_delivery"
+      //                       ? "Delivered"
+      //                       : "Completed",
+      //                   style: const TextStyle(color: Colors.white),
+      //                 ),
+      //                 // label: Text(order.status == "rider_assign" ? "Pick-Up" : "Delivered",style: TextStyle(color: Colors.white),),
+      //                 style: ElevatedButton.styleFrom(
+      //                   backgroundColor: primaryOrange,
+      //                   padding:
+      //                   const EdgeInsets.symmetric(
+      //                       vertical: 16),
+      //                   shape: RoundedRectangleBorder(
+      //                     borderRadius:
+      //                     BorderRadius.circular(30),
+      //                   ),
+      //                 ),
+      //               ),
+      //             ),
+      //           ],
+      //         ),
+      //       )
+      //     ],
+      //   );
+      // }),
     );
   }
 
