@@ -170,7 +170,7 @@ class OtpController extends GetxController {
         if (userData["approvalStatus"] == "pending") {
           Get.offAllNamed(AppRoutes.personal);
         } else {
-          Get.offAllNamed(AppRoutes.home);
+          Get.offAllNamed(AppRoutes.nav);
         }
       } else {
         Get.snackbar("Error", response["message"] ?? "Invalid OTP");

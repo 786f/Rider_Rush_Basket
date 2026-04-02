@@ -24,6 +24,7 @@ class SplashController extends GetxController {
     } else {
       // Token not present → Login
       Get.offNamed(AppRoutes.login);
+      // Get.offNamed(AppRoutes.riderJobList);
     }
   }
 }

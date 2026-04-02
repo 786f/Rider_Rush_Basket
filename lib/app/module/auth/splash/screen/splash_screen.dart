@@ -16,7 +16,7 @@ class SplashPage extends GetWidget<SplashController> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Image.asset("assets/png/rushbasket.png"),
+            Image.asset("assets/png/finallogo.png"),
           ],
         ),
       ),

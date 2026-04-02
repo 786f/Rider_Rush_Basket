@@ -80,6 +80,11 @@ class MyApp extends StatelessWidget {
           name: AppRoutes.nav,
           page: () =>  BottomNavScreen(),
         ),
+
+        // GetPage(
+        //   name: AppRoutes.home,
+        //   page: () =>  Dass(),
+        // ),
       ],
     );
   }

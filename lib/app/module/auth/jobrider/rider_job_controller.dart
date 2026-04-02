@@ -36,7 +36,7 @@ class RiderJobController extends GetxController {
       }
 
       final Uri url =
-      Uri.parse("$baseUrl?city=siwan");
+      Uri.parse("$baseUrl?city=bhopal");
 
       final response = await http.get(
         url,
@@ -58,42 +58,93 @@ class RiderJobController extends GetxController {
       }
     } catch (e) {
       Get.snackbar("Error", e.toString());
+      print(e);
     } finally {
       isLoading.value = false;
     }
   }
 
+
+  // Future<void> applyForJob(String jobPostId) async {
+  //   try {
+  //     isLoading.value = true;
+  //
+  //     final response = await DioClient.instance.post(
+  //       ApiEndpoints.applyJob,
+  //       data: {
+  //         "jobPostId": jobPostId,
+  //       },
+  //     );
+  //
+  //     if (response.statusCode == 200 ||
+  //         response.statusCode == 201) {
+  //       Get.snackbar(
+  //         "Success",
+  //         response.data['message'] ??
+  //             "Application submitted",
+  //       );
+  //     }
+  //   } catch (e) {
+  //     Get.snackbar(
+  //       "Error",
+  //       "Something went wrong. Please try again.",
+  //     );
+  //
+  //     print("Unexpected Error: $e");
+  //   } finally {
+  //     isLoading.value = false;
+  //   }
+  // }
 
   Future<void> applyForJob(String jobPostId) async {
     try {
       isLoading.value = true;
 
-      final response = await DioClient.instance.post(
-        ApiEndpoints.applyJob,
-        data: {
-          "jobPostId": jobPostId,
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? token = prefs.getString("auth_token");
+
+      if (token == null) {
+        Get.snackbar("Error", "Token not found");
+        return;
+      }
+
+      final Uri url = Uri.parse("https://api.rushbaskets.com/api/rider-job-application/apply");
+
+      final response = await http.post(
+        url,
+        headers: {
+          "Authorization": "Bearer $token",
+          "Content-Type": "application/json",
         },
+        body: jsonEncode({
+          "jobPostId": jobPostId,
+        }),
       );
 
-      if (response.statusCode == 200 ||
-          response.statusCode == 201) {
+      final body = json.decode(response.body);
+      print(body);
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
         Get.snackbar(
           "Success",
-          response.data['message'] ??
-              "Application submitted",
+          body['message'] ?? "Application submitted",
+        );
+      } else {
+        Get.snackbar(
+          "Error",
+          body['message'] ?? "Failed to apply",
         );
       }
+
     } catch (e) {
       Get.snackbar(
         "Error",
-        "Something went wrong. Please try again.",
+        e.toString(),
       );
-
-      print("Unexpected Error: $e");
+      print("HTTP Error: $e");
     } finally {
       isLoading.value = false;
     }
   }
-
 
 }

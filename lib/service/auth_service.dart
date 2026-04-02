@@ -94,6 +94,9 @@ class AuthService {
 
       final decoded = jsonDecode(response.body);
       return decoded;
+
+
+
     } catch (e) {
       print("VERIFY OTP SERVICE ERROR: $e");
       rethrow;

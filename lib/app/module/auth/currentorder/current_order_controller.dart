@@ -44,6 +44,7 @@ class CurrentOrderController extends GetxController {
         orderData.value = null;
       }
     } catch (e) {
+      print(e);
       Get.snackbar("Error", "Failed to load order");
     } finally {
       isLoading(false);
